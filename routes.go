@@ -5,50 +5,34 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 )
 
-type Commands map[string]func([]byte) ([]byte, error)
+var upgrader = websocket.Upgrader{}
 
-var commands Commands = make(Commands)
-
-func get(f func() interface{}) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		out, err := json.Marshal(f())
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-		} else {
-			w.Write(out)
-		}
+func ws(w http.ResponseWriter, r *http.Request) {
+	c, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Print("Upgrade:", err)
+		return
 	}
-}
-
-func post(f func(interface{}) interface{}, t func(*json.Decoder) (interface{}, error)) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		decoder := json.NewDecoder(r.Body)
-
-		val, err := t(decoder)
-
+	defer c.Close()
+	msg, _ := json.Marshal(GetTables())
+	_ = c.WriteMessage(websocket.TextMessage, msg)
+	for {
+		_, message, err := c.ReadMessage()
 		if err != nil {
-			http.Error(w, err.Error(), 400)
-			return
+			log.Println("read:", err)
+			break
 		}
-
-		out, err := json.Marshal(f(val))
-		if err != nil {
-			http.Error(w, err.Error(), 500)
-		} else {
-			w.Write(out)
-		}
+		log.Printf("recv: %s", message)
 	}
 }
 
 func Listen(addr string) {
 	Tables = append(Tables, Table{Name: "test"})
-	r := mux.NewRouter()
-	r.Methods("GET").Path("/table").HandlerFunc(get(GetTables))
-	r.Methods("POST").Path("/table").HandlerFunc(post(AddTable, DecodeTable))
-	http.Handle("/", r)
+	http.HandleFunc("/websocket", ws)
+	http.Handle("/", http.FileServer(http.Dir("dist")))
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)

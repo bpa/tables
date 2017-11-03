@@ -3,14 +3,15 @@ package tables
 import "encoding/json"
 
 type Table struct {
-	Name string
-	//players []string
+	Name    string   `json:"name"`
+	Players []string `json:"players"`
 	//start   time.Time
 	//end     time.Time
 }
 
 type TableStruct struct {
-	Tables []Table
+	Cmd    string  `json:"cmd"`
+	Tables []Table `json:"tables"`
 }
 
 func DecodeTable(d *json.Decoder) (interface{}, error) {
@@ -22,7 +23,7 @@ func DecodeTable(d *json.Decoder) (interface{}, error) {
 var Tables []Table = make([]Table, 0, 3)
 
 func GetTables() interface{} {
-	return TableStruct{Tables: Tables}
+	return TableStruct{Cmd: "tables", Tables: Tables}
 }
 
 func AddTable(t interface{}) interface{} {
