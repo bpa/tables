@@ -30,7 +30,8 @@ func ws(w http.ResponseWriter, r *http.Request) {
 }
 
 func Listen(addr string) {
-	Tables = append(Tables, Table{Name: "test"})
+	players := [...]Player{{FullName: "Bruce Armstrong"}}
+	Tables = append(Tables, Table{Name: "test", Min: 2, Max: 6, Players: players[:]})
 	http.HandleFunc("/websocket", ws)
 	http.Handle("/", http.FileServer(http.Dir("dist")))
 	err := http.ListenAndServe(addr, nil)

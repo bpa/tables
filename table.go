@@ -1,12 +1,17 @@
 package tables
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Table struct {
-	Name    string   `json:"name"`
-	Players []string `json:"players"`
-	//start   time.Time
-	//end     time.Time
+	Name     string    `json:"name"`
+	Players  []Player  `json:"players"`
+	Min      int       `json:"min"`
+	Max      int       `json:"max"`
+	Location string    `json:"location"`
+	Start    time.Time `json:"start"`
 }
 
 type TableStruct struct {

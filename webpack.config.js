@@ -8,20 +8,19 @@ module.exports = {
     path: path.resolve(__dirname, 'dist')
   },
   plugins: [
-    new HtmlWebpackPlugin({title: 'Tables'})
+    new HtmlWebpackPlugin({
+      template: 'index.html'
+    })
   ],
   module: {
     rules: [
       { test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader'
-        ]
+        use: ['style-loader', 'css-loader']
       },
       { test: /\.js$/,
         loader: 'babel-loader',
         include: path.resolve(__dirname, "js")
-	  }
+      }
     ]
   }
 };
