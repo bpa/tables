@@ -1,14 +1,11 @@
 package main
 
-import (
-	"flag"
-
-	"github.com/bpa/tables"
-)
+import "flag"
 
 var addr = flag.String("addr", ":8080", "http service address")
 
 func main() {
 	flag.Parse()
-	tables.Listen(*addr)
+	LoadStartupFiles()
+	Listen(*addr)
 }

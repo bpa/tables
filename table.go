@@ -1,4 +1,4 @@
-package tables
+package main
 
 import (
 	"encoding/json"
@@ -22,8 +22,6 @@ func DecodeTable(d *json.Decoder) (interface{}, error) {
 	err := d.Decode(&t)
 	return t, err
 }
-
-var Tables []Table = make([]Table, 0, 3)
 
 func GetTables() interface{} {
 	return TableMsg{Cmd: "tables", Tables: Tables}

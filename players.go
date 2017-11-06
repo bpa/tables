@@ -1,4 +1,4 @@
-package tables
+package main
 
 type Player struct {
 	FullName string `json:"fullName"`

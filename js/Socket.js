@@ -5,7 +5,8 @@ export default class Socket {
   }
 
   init() {
-    this.ws = new WebSocket('ws://'+location.host+'/websocket');
+    let path = "ws" + location.toString().substr(4) + "/websocket";
+    this.ws = new WebSocket(path);
     this.ws.onmessage = this.on_message;
     this.ws.onclose = () => setTimeout(this.init.bind(this), 1000);
   }

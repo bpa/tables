@@ -15,3 +15,7 @@
 
 dist
 node_modules
+
+# Site configuration
+config.json
+state.json

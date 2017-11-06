@@ -1,4 +1,4 @@
-package tables
+package main
 
 type User struct {
 	FullName string
