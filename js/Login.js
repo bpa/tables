@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField } from 'material-ui';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography } from 'material-ui';
 import ws from './Socket';
 
 var player = {};
@@ -50,9 +50,9 @@ class Login extends React.Component {
   render() {
     if (this.state.player) {
       return (
-        <Button color="contrast">
+        <Typography color="inherit" type="title">
           {this.state.player.fullName}
-        </Button>
+        </Typography>
       );
     }
     return (
