@@ -5,6 +5,7 @@ import { AppBar, Button, Divider, IconButton, List, ListItem, ListItemIcon, List
 import CreateTable from './CreateTable';
 import Table from './Table';
 import MenuIcon from 'material-ui-icons/Menu';
+import { Login } from './Login';
 
 class Client extends React.Component {
   constructor() {
@@ -36,7 +37,7 @@ class Client extends React.Component {
             <Typography type="title" color="inherit" style={{flex: 1}}>
               Tables
             </Typography>
-            <Button color="contrast">Login</Button>
+            <Login/>
           </Toolbar>
         </AppBar>
         <div style={{display:'flex',alignItems:'flex-start'}}>

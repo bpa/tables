@@ -6,6 +6,7 @@ import AddIcon from 'material-ui-icons/Add';
 import Edit from 'material-ui-icons/Edit';
 import ws from './Socket';
 import moment from 'moment';
+import { player } from './Login';
 
 export default class CreateTable extends React.Component {
   constructor() {
@@ -36,7 +37,7 @@ export default class CreateTable extends React.Component {
 
   create() {
     let start = this.state.start.split(':'),
-      now = moment();
+    now = moment();
     now.hour(start[0]);
     now.minute(start[1]);
     console.log(now.hour());
@@ -45,6 +46,7 @@ export default class CreateTable extends React.Component {
       game:this.state.game,
       location:this.state.location,
       start:now,
+      player:player.data,
     });
     this.setState({open: false});
   }

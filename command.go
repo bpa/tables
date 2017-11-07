@@ -27,6 +27,7 @@ var commands = map[string]Command{
 	"create_game": CreateGame,
 	"error":       PrintError,
 	"new_game":    NewGame,
+	"login":       Login,
 }
 
 func handleMessage(c *Client, message []byte) {
