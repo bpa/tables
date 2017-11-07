@@ -1,18 +1,16 @@
 import React from 'react';
 import { render } from 'react-dom';
-import Socket from './Socket';
+import ws from './Socket';
 import { AppBar, Button, Divider, IconButton, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography } from 'material-ui';
 import CreateTable from './CreateTable';
 import Table from './Table';
 import MenuIcon from 'material-ui-icons/Menu';
 
-var ws;
-
 class Client extends React.Component {
   constructor() {
     super();
-    ws = new Socket(this);
     this.state = {tables: []}
+    ws.register('tables', this.on_tables.bind(this));
 
     window.onerror =  function(messageOrEvent, source, lineno, colno, error) {
       ws.send({cmd: 'error',

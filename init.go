@@ -2,12 +2,13 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 )
 
 var secret string
-var Games []Game
+var Games map[string]Game
 var Locations []string
 var Tables []Table
 
@@ -16,12 +17,12 @@ type config struct {
 }
 
 type memory struct {
-	Games     []Game
+	Games     map[string]Game
 	Locations []string
 	Tables    []Table
 }
 
-func LoadStartupFiles() {
+func loadStartupFiles() {
 	readConfig()
 	readState()
 }
@@ -55,6 +56,8 @@ func readState() {
 			Tables = mem.Tables
 			Games = mem.Games
 			Locations = mem.Locations
+		} else {
+			fmt.Printf("Error reading state.json: %s\n", err)
 		}
 	}
 
@@ -62,7 +65,7 @@ func readState() {
 		Tables = make([]Table, 0, 3)
 	}
 	if Games == nil {
-		Games = make([]Game, 0, 3)
+		Games = make(map[string]Game)
 	}
 	if Locations == nil {
 		Locations = make([]string, 0, 3)
