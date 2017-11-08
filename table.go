@@ -65,6 +65,7 @@ func AddPlayerToTable(player *Player, tableId string) error {
 		}
 	}
 	table.Players = append(table.Players, *player)
+	saveState()
 	return nil
 }
 
@@ -77,6 +78,7 @@ func DeletePlayerFromTable(playerId string, tableId string) error {
 	for i := range table.Players {
 		if table.Players[i].Id == playerId {
 			table.Players = append(table.Players[:i], table.Players[i+1:]...)
+			saveState()
 			return nil
 		}
 	}
