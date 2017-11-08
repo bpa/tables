@@ -24,10 +24,10 @@ func PrintError(c *Client, msg []byte) error {
 }
 
 var commands = map[string]Command{
-	"create_game": CreateGame,
-	"error":       PrintError,
-	"new_game":    NewGame,
-	"login":       Login,
+	"create_table": CreateTable,
+	"error":        PrintError,
+	"new_game":     NewGame,
+	"login":        Login,
 }
 
 func handleMessage(c *Client, message []byte) {

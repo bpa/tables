@@ -7,15 +7,15 @@ import (
 	"time"
 )
 
-type CreateGameMessage struct {
+type CreateTableMessage struct {
 	Game     string    `json:"game"`
 	Location string    `json:"location"`
 	Start    time.Time `json:"start"`
 	Player   Player    `json:"player"`
 }
 
-func CreateGame(c *Client, msg []byte) error {
-	var cmd CreateGameMessage
+func CreateTable(c *Client, msg []byte) error {
+	var cmd CreateTableMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
 		return err
@@ -45,12 +45,7 @@ func CreateGame(c *Client, msg []byte) error {
 	players := make([]Player, 0, game.Max)
 	players = append(players, cmd.Player)
 
-	Tables = append(Tables, Table{
-		Game:     game,
-		Location: cmd.Location,
-		Start:    cmd.Start,
-		Players:  players,
-	})
+	AddNewTable(game, cmd.Location, cmd.Start, players)
 
 	g, _ := json.Marshal(GetTables())
 	c.hub.broadcast <- g

@@ -31,7 +31,7 @@ export default class CreateTable extends React.Component {
   }
 
   close() {
-    ws.send({cmd:'cancel_game_creation'});
+    ws.send({cmd:'cancel_table_creation'});
     this.setState({open: false});
   }
 
@@ -42,7 +42,7 @@ export default class CreateTable extends React.Component {
     now.minute(start[1]);
     console.log(now.hour());
     ws.send({
-      cmd:'create_game',
+      cmd:'create_table',
       game:this.state.game,
       location:this.state.location,
       start:now,
