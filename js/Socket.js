@@ -30,7 +30,8 @@ class Socket {
   }
 
   init() {
-    let path = location.toString().replace(/https?/, 'ws') + 'websocket';
+    let path = location.toString()
+      .replace(/https?/, 'ws').replace(/\?.*$/,'') + 'websocket';
     this.ws = new WebSocket(path);
     this.ws.onmessage = this.handle_message.bind(this);
     this.ws.onclose = () => setTimeout(this.init.bind(this), 1000);

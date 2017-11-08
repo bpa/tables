@@ -28,7 +28,9 @@ var commands = map[string]Command{
 	"error":        PrintError,
 	"join_table":   JoinTable,
 	"leave_table":  LeaveTable,
+	"list_games":   ListGames,
 	"login":        Login,
+	"logout":       Logout,
 	"new_game":     NewGame,
 }
 

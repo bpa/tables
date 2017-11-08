@@ -11,6 +11,7 @@ class Login extends React.Component {
     this.close = this.close.bind(this);
     this.login = this.login.bind(this);
     ws.register('login', this.on_login.bind(this));
+    ws.register('logout', this.on_logout.bind(this));
 
     let state = {open:false, name:''};
     if (window.localStorage.player) {
@@ -41,10 +42,15 @@ class Login extends React.Component {
   }
 
   on_login(msg) {
-    console.log(msg);
     window.localStorage.player = JSON.stringify(msg.player);
     this.setState({player: msg.player, open:false});
     player.data = msg.player;
+  }
+
+  on_logout(msg) {
+    window.localStorage.removeItem('player');
+    this.setState({player: null, open:false});
+    delete player.data;
   }
 
   render() {

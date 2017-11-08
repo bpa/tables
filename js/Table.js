@@ -41,7 +41,7 @@ function join_table() {
 export default function Table(props) {
   let table = props.table,
       start = moment(table.start, moment.ISO_8601).format("h:mm A"),
-      seat  = table.players.findIndex((p) => player.data.id === p.id),
+      seat  = table.players.findIndex((p) => player.data && player.data.id === p.id),
       join  = seat === -1,
       owner = seat === 0;
 

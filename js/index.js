@@ -1,10 +1,10 @@
 import React from 'react';
 import { render } from 'react-dom';
 import ws from './Socket';
-import { AppBar, Button, Divider, IconButton, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography } from 'material-ui';
+import { AppBar, Button, Divider, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography } from 'material-ui';
 import CreateTable from './CreateTable';
+import MainMenu from './MainMenu';
 import Table from './Table';
-import MenuIcon from 'material-ui-icons/Menu';
 import { Login } from './Login';
 
 class Client extends React.Component {
@@ -30,10 +30,7 @@ class Client extends React.Component {
       <div>
         <AppBar position="static">
           <Toolbar>
-            <IconButton color="contrast" aria-label="Menu"
-                style={{marginLeft:-12, marginRight:20}}>
-              <MenuIcon/>
-            </IconButton>
+            <MainMenu/>
             <Typography type="title" color="inherit" style={{flex: 1}}>
               Tables
             </Typography>
