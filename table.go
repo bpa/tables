@@ -84,3 +84,21 @@ func DeletePlayerFromTable(playerId string, tableId string) error {
 	}
 	return errors.New("Player isn't at table")
 }
+
+const EXPIRE_TIME = time.Minute * 45
+
+func RemoveExpiredTables() {
+	removed := false
+	now := time.Now()
+	for i := range Tables {
+		if Tables[i].Start.Add(EXPIRE_TIME).Before(now) {
+			Tables = append(Tables[:i], Tables[i+1:]...)
+			removed = true
+		}
+	}
+	if removed {
+		saveState()
+		g, _ := json.Marshal(GetTables())
+		hub.broadcast <- g
+	}
+}
