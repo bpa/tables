@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"github.com/satori/go.uuid"
 )
 
 type LoginMessage struct {
@@ -21,6 +22,7 @@ func Login(c *Client, msg []byte) error {
 		return errors.New("fullName is required")
 	}
 
+	cmd.Player.Id = uuid.NewV4().String()
 	c.player = cmd.Player
 
 	g, _ := json.Marshal(cmd)
