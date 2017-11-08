@@ -40,6 +40,7 @@ func AddNewTable(game Game, loc string, start time.Time, players []Player) {
 		Start:    start,
 		Id:       id,
 	})
+	saveState()
 }
 
 func FindTable(id string) (*Table, error) {

@@ -71,3 +71,20 @@ func readState() {
 		Locations = make([]string, 0, 3)
 	}
 }
+
+func saveState() {
+	f, err := os.OpenFile("state.json", os.O_RDWR|os.O_CREATE, 0755)
+	if err == nil {
+		defer f.Close()
+
+		enc := json.NewEncoder(f)
+		err = enc.Encode(memory{
+			Games:     Games,
+			Locations: Locations,
+			Tables:    Tables,
+		})
+		if err != nil {
+			fmt.Printf("Error writing state.json: %s\n", err)
+		}
+	}
+}

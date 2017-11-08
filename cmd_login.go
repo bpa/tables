@@ -3,7 +3,8 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"github.com/satori/go.uuid"
+
+	uuid "github.com/satori/go.uuid"
 )
 
 type LoginMessage struct {
