@@ -1,10 +1,12 @@
 import React from 'react';
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography } from 'material-ui';
+import { Button, Card, CardContent, CardActions, Divider, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from 'material-ui';
 import People from 'material-ui-icons/People';
 import Event from 'material-ui-icons/Event';
 import Schedule from 'material-ui-icons/Schedule';
 import Room from 'material-ui-icons/Room';
 import moment from 'moment';
+import { player } from './Login';
+import ws from './Socket';
 
 function Player(props) {
   let name = props.player ? props.player.fullName || '' : '';
@@ -26,10 +28,26 @@ function Players(props) {
   return <List>{list}</List>;
 }
 
+function leave_table() {
+  console.log("leave", this);
+  ws.send({cmd:'leave_table', id: this.id, player: player.data});
+}
+
+function join_table() {
+  console.log("join", this);
+  ws.send({cmd:'join_table', id: this.id, player: player.data});
+}
+
 export default function Table(props) {
-  let { table } = props, start = moment(table.start, moment.ISO_8601);
+  let table = props.table,
+      start = moment(table.start, moment.ISO_8601).format("h:mm A"),
+      seat  = table.players.findIndex((p) => player.data.id === p.id),
+      join  = seat === -1,
+      owner = seat === 0;
+
   return (
-      <Paper elevation={4} style={{padding:4,margin:8}}>
+    <Card elevation={4} style={{padding:4,margin:8}}>
+      <CardContent>
         <List dense>
           <ListItem>
             <ListItemIcon><Event/></ListItemIcon>
@@ -37,7 +55,7 @@ export default function Table(props) {
           </ListItem>
           <ListItem>
             <ListItemIcon><Schedule/></ListItemIcon>
-            <ListItemText primary={start.format("h:mm A")}/>
+            <ListItemText primary={start}/>
           </ListItem>
           <ListItem>
             <ListItemIcon><People/></ListItemIcon>
@@ -50,8 +68,14 @@ export default function Table(props) {
         </List>
         <Divider/>
         <Players players={table.players} max={table.game.max}/>
-        <Divider/>
-      </Paper>
+      </CardContent>
+      <CardActions>
+      {join
+        ? <Button dense onClick={join_table.bind(table)}>Join</Button>
+        : <Button dense onClick={leave_table.bind(table)}>Leave</Button>
+      }
+      </CardActions>
+    </Card>
   );
 }
 

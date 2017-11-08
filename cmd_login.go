@@ -26,6 +26,6 @@ func Login(c *Client, msg []byte) error {
 	c.player = cmd.Player
 
 	g, _ := json.Marshal(cmd)
-	c.hub.broadcast <- g
+	c.send <- g
 	return nil
 }

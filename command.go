@@ -26,8 +26,10 @@ func PrintError(c *Client, msg []byte) error {
 var commands = map[string]Command{
 	"create_table": CreateTable,
 	"error":        PrintError,
-	"new_game":     NewGame,
+	"join_table":   JoinTable,
+	"leave_table":  LeaveTable,
 	"login":        Login,
+	"new_game":     NewGame,
 }
 
 func handleMessage(c *Client, message []byte) {
