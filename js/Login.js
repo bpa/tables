@@ -68,7 +68,7 @@ class Login extends React.Component {
           <DialogTitle>Login</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Welcome.  For the short term, we'll just need your name as other people know it.
+              For the short term, we'll just need your name as other people know it.
             </DialogContentText>
             <form noValidate autoComplete="off">
               <TextField id="name" label="Name" margin="normal" style={{width:'100%'}}
