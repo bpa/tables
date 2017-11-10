@@ -5,15 +5,8 @@ import Menu, { MenuItem } from 'material-ui/Menu';
 import ws from './Socket';
 import CloseIcon from 'material-ui-icons/Close';
 import Slide from 'material-ui/transitions/Slide';
-
-function Game(props) {
-  let game = props.game;
-  return (
-    <ListItem>
-      <ListItemText primary={game.name}/>
-    </ListItem>
-  );
-}
+import GameItem from './GameItem';
+import GameDialog from './GameDialog';
 
 function Up(props) {
   return <Slide direction="up" {...props}/>;
@@ -23,11 +16,24 @@ export default class EditGames extends React.Component {
   constructor(props) {
     super(props);
     this.gcb = ws.register('games', this.on_games.bind(this));
-    this.state = {games: {}}
+    this.state = {games: {}, open:false, keys:[]}
   }
 
+  cancel() {
+    this.setState({open: false});
+  }
+
+  edit() {
+    this.setState({open: true});
+  }
+
+	delete_game() {
+	}
+
   on_games(msg) {
-    this.setState({games: msg.games});
+    let g = msg.games,
+        k = Object.keys(g).sort((a,b)=>g[b].name < g[a].name);
+    this.setState({games: msg.games, keys: k});
   }
 
   componentWillUnmount() {
@@ -53,10 +59,12 @@ export default class EditGames extends React.Component {
           </Toolbar>
         </AppBar>
         <List>
-        {Object.keys(games).map((k)=><Game game={games[k]}/>)}
-        <ListItem button>
-          <ListItemText primary="Add new game"/>
-        </ListItem>
+          {this.state.keys.map((k)=><GameItem game={games[k]} key={k}/>)}
+          <ListItem button onClick={this.edit.bind(this)}>
+            <ListItemText primary="Add new game"/>
+          </ListItem>
+          <GameDialog game={{name:'', min:2, max:10}} title="New Game"
+            open={this.state.open} onRequestClose={this.cancel.bind(this)} />
         </List>
       </Dialog>
     );

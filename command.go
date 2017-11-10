@@ -24,14 +24,20 @@ func PrintError(c *Client, msg []byte) error {
 }
 
 var commands = map[string]Command{
-	"create_table": CreateTable,
-	"error":        PrintError,
-	"join_table":   JoinTable,
-	"leave_table":  LeaveTable,
-	"list_games":   ListGames,
-	"login":        Login,
-	"logout":       Logout,
-	"new_game":     NewGame,
+	"create_location": CreateLocation,
+	"create_table":    CreateTable,
+	"delete_game":     DeleteGame,
+	"delete_location": DeleteLocation,
+	"edit_location":   EditLocation,
+	"error":           PrintError,
+	"join_table":      JoinTable,
+	"leave_table":     LeaveTable,
+	"list_games":      ListGames,
+	"list_locations":  ListLocations,
+	"login":           Login,
+	"logout":          Logout,
+	"new_game":        NewGame,
+	"save_game":       SaveGame,
 }
 
 func handleMessage(c *Client, message []byte) {

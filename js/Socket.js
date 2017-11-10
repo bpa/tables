@@ -18,6 +18,7 @@ class Socket {
       this.init();
       this.initialized = true;
     }
+    return id;
   }
 
   deregister(id) {

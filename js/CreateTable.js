@@ -3,7 +3,6 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl,
   IconButton, Input, InputLabel, MenuItem, Select, TextField } from 'material-ui';
 
 import AddIcon from 'material-ui-icons/Add';
-import Edit from 'material-ui-icons/Edit';
 import ws from './Socket';
 import moment from 'moment';
 import { player } from './Login';
@@ -17,7 +16,7 @@ export default class CreateTable extends React.Component {
     this.state = {open: false};
     this.locCb = ws.register('locations', this.on_locations.bind(this));
     this.gameCb = ws.register('games', this.on_games.bind(this));
-    this.state = { locations: [], location: '', games: [], game: '' };
+    this.state = { locations: [], location: '', games: [], game: '', keys:[] };
   }
 
   componentWillUnmount() {
@@ -43,7 +42,7 @@ export default class CreateTable extends React.Component {
     console.log(now.hour());
     ws.send({
       cmd:'create_table',
-      game:this.state.game,
+      game:this.state.game.id,
       location:this.state.location,
       start:now,
       player:player.data,
@@ -60,10 +59,13 @@ export default class CreateTable extends React.Component {
   }
 
   on_games(msg) {
-    this.setState({games: Object.keys(msg.games)});
+    let g = msg.games,
+        k = Object.keys(g).sort((a,b)=>g[b].name < g[a].name);
+    this.setState({games: g, keys: k});
   }
 
   render() {
+    let games = this.state.games;
     return (
       <div>
         <Button fab style={{alignSelf:"center", margin:"100px"}} color="primary" aria-label="add" onClick={this.open}>
@@ -80,8 +82,8 @@ export default class CreateTable extends React.Component {
                   onChange={this.on_change.bind(this, 'game')}
                   input={<Input id="game"/>}
                 >
-                  {this.state.games.map((g) => (
-                        <MenuItem value={g} key={g}>{g}</MenuItem>))}
+                  {this.state.keys.map((k) => (
+                        <MenuItem value={games[k]} key={k}>{games[k].name}</MenuItem>))}
                 </Select>
               </FormControl>
               <br/>

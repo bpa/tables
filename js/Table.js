@@ -43,7 +43,10 @@ export default function Table(props) {
       start = moment(table.start, moment.ISO_8601).format("h:mm A"),
       seat  = table.players.findIndex((p) => player.data && player.data.id === p.id),
       join  = seat === -1,
-      owner = seat === 0;
+      owner = seat === 0,
+      players = table.game.min == table.game.max
+        ? table.game.min + ' players'
+        : table.game.min + '-' + table.game.max + ' players';
 
   return (
     <Card elevation={4} style={{padding:4,margin:8}}>
@@ -59,7 +62,7 @@ export default function Table(props) {
           </ListItem>
           <ListItem>
             <ListItemIcon><People/></ListItemIcon>
-            <ListItemText primary={table.game.min + '-' + table.game.max}/>
+            <ListItemText primary={players}/>
           </ListItem>
           <ListItem>
             <ListItemIcon><Room/></ListItemIcon>
