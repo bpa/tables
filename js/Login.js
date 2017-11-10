@@ -33,7 +33,6 @@ class Login extends React.Component {
   }
 
   login() {
-    console.log("logging in");
     ws.send({cmd: 'login', player: {fullName:this.state.name}});
   }
 
