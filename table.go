@@ -31,16 +31,18 @@ func GetTables() TablesMessage {
 	return TablesMessage{Cmd: "tables", Tables: Tables}
 }
 
-func AddNewTable(game Game, loc string, start time.Time, players []Player) {
+func AddNewTable(game Game, loc string, start time.Time, players []Player) Table {
 	id := uuid.NewV4().String()
-	Tables = append(Tables, Table{
+	table := Table{
 		Game:     game,
 		Players:  players,
 		Location: loc,
 		Start:    start,
 		Id:       id,
-	})
+	}
+	Tables = append(Tables, table)
 	saveState()
+	return table
 }
 
 func FindTable(id string) (*Table, error) {

@@ -8,18 +8,25 @@ import (
 )
 
 var secret string
+var SiteUrl string
 var Games map[string]Game
 var Locations []string
 var Tables []Table
+var Notifiers = make(map[string]Notifier)
+var Notifications map[string][]Player
 
 type config struct {
-	Secret string
+	Secret         string
+	SiteUrl        string
+	Authentication map[string]string
+	Notifications  map[string]map[string]string
 }
 
 type memory struct {
-	Games     map[string]Game
-	Locations []string
-	Tables    []Table
+	Games         map[string]Game
+	Locations     []string
+	Tables        []Table
+	Notifications map[string][]Player
 }
 
 func loadStartupFiles() {
@@ -41,7 +48,22 @@ func readConfig() {
 		log.Fatalf("Can't read config.json: %s", err)
 	}
 
+	if conf.Authentication["type"] == "LDAP" {
+		commands["login"] = LDAPLogin
+		LDAPInit(conf.Authentication)
+	}
+	for k := range conf.Notifications {
+		notifier := conf.Notifications[k]
+		if notifier["type"] == "http" {
+			note, err := NewNotifyHttp(notifier)
+			if err != nil {
+				log.Fatal(fmt.Sprintf("Error in config.json/notifications/%s: %s", k, err.Error()))
+			}
+			Notifiers[k] = note
+		}
+	}
 	secret = conf.Secret
+	SiteUrl = conf.SiteUrl
 }
 
 func readState() {
@@ -56,6 +78,7 @@ func readState() {
 			Tables = mem.Tables
 			Games = mem.Games
 			Locations = mem.Locations
+			Notifications = mem.Notifications
 		} else {
 			fmt.Printf("Error reading state.json: %s\n", err)
 		}
@@ -70,6 +93,9 @@ func readState() {
 	if Locations == nil {
 		Locations = make([]string, 0, 3)
 	}
+	if Notifications == nil {
+		Notifications = make(map[string][]Player)
+	}
 }
 
 func saveState() {
@@ -79,9 +105,10 @@ func saveState() {
 
 		enc := json.NewEncoder(f)
 		err = enc.Encode(memory{
-			Games:     Games,
-			Locations: Locations,
-			Tables:    Tables,
+			Games:         Games,
+			Locations:     Locations,
+			Tables:        Tables,
+			Notifications: Notifications,
 		})
 		if err != nil {
 			fmt.Printf("Error writing state.json: %s\n", err)

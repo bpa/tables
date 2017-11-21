@@ -45,9 +45,11 @@ func CreateTable(c *Client, msg []byte) error {
 	players := make([]Player, 0, game.Max)
 	players = append(players, cmd.Player)
 
-	AddNewTable(game, cmd.Location, cmd.Start, players)
+	table := AddNewTable(game, cmd.Location, cmd.Start, players)
 
 	g, _ := json.Marshal(GetTables())
 	c.hub.broadcast <- g
+
+	go NotifyNewTable(&table, &cmd.Player)
 	return nil
 }
