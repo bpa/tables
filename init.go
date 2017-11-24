@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -53,14 +54,20 @@ func readConfig() {
 		LDAPInit(conf.Authentication)
 	}
 	for k := range conf.Notifications {
+		var note Notifier
 		notifier := conf.Notifications[k]
-		if notifier["type"] == "http" {
-			note, err := NewNotifyHttp(notifier)
-			if err != nil {
-				log.Fatal(fmt.Sprintf("Error in config.json/notifications/%s: %s", k, err.Error()))
-			}
-			Notifiers[k] = note
+		switch notifier["type"] {
+		case "http":
+			note, err = NewNotifyHttp(notifier)
+		case "smtp":
+			note, err = NewNotifySmtp(notifier)
+		default:
+			err = errors.New(fmt.Sprintf("Unknown type '%s'", notifier["type"]))
 		}
+		if err != nil {
+			log.Fatal(fmt.Sprintf("Error in config.json/notifications/%s: %s", k, err.Error()))
+		}
+		Notifiers[k] = note
 	}
 	secret = conf.Secret
 	SiteUrl = conf.SiteUrl
