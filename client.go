@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -19,10 +20,11 @@ const (
 var upgrader = websocket.Upgrader{}
 
 type Client struct {
-	hub    *Hub
-	conn   *websocket.Conn
-	player Player
-	send   chan []byte
+	hub        *Hub
+	conn       *websocket.Conn
+	player     Player
+	send       chan []byte
+	remoteHost string
 }
 
 func (c *Client) readPump() {
@@ -79,7 +81,15 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), remoteHost: r.Header.Get("X-Forwarded-For")}
+	if client.remoteHost == "" {
+		addr := conn.RemoteAddr().String()
+		i := strings.LastIndexByte(addr, ':')
+		if i != -1 {
+			addr = addr[:i]
+		}
+		client.remoteHost = addr
+	}
 	client.hub.register <- client
 
 	msg, _ := json.Marshal(GetTables())

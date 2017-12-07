@@ -22,12 +22,7 @@ func NoAuthLogin(c *Client, msg []byte) error {
 		return errors.New("fullName is required")
 	}
 
-	addr := c.conn.RemoteAddr().String()
-	i := strings.LastIndexByte(addr, ':')
-	if i != -1 {
-		addr = addr[:i]
-	}
-	cmd.Player.Id = addr
+	cmd.Player.Id = c.remoteHost
 	c.player = cmd.Player
 
 	g, _ := json.Marshal(cmd)
