@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"strings"
 )
 
 type LoginMessage struct {
