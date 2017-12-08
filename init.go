@@ -16,11 +16,16 @@ var Tables []Table
 var Notifiers = make(map[string]Notifier)
 var Notifications map[string][]Player
 
+type implEntry struct {
+	Type   string
+	config *json.RawMessage
+}
+
 type config struct {
 	Secret         string
 	SiteUrl        string
-	Authentication map[string]string
-	Notifications  map[string]map[string]string
+	Authentication map[string]implEntry
+	Notifications  map[string]implEntry
 }
 
 type memory struct {
@@ -49,16 +54,27 @@ func readConfig() {
 		log.Fatalf("Can't read config.json: %s", err)
 	}
 
-	if conf.Authentication["type"] == "LDAP" {
-		commands["login"] = LDAPLogin
-		LDAPInit(conf.Authentication)
+	for k := range conf.Authentication {
+		auth := conf.Authentication[k]
+		var impl Authentication
+		switch auth.Type {
+		case "LDAPAuth":
+			impl, err = NewLDAPAuth(auth.config)
+		case "TrustedAuth":
+			impl, err = NewTrustedAuth()
+		default:
+			log.Fatal("Unknown authentication implementation '%s'", auth.Type)
+		}
+		if err != nil {
+			log.Fatal("Can't create '%s' of type %s: %s", k, auth.Type, err.Error())
+		}
 	}
 	for k := range conf.Notifications {
 		var note Notifier
 		notifier := conf.Notifications[k]
-		switch notifier["type"] {
+		switch notifier.Type {
 		case "http":
-			note, err = NewNotifyHttp(notifier)
+			note, err = NewNotifyHttp(notifier.config)
 		case "smtp":
 			note, err = NewNotifySmtp(notifier)
 		default:

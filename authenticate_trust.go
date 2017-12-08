@@ -5,26 +5,28 @@ import (
 	"errors"
 )
 
-type LoginMessage struct {
+type TrustedAuth struct{}
+
+func NewTrustedAuth() (TrustedAuth, error) {
+	return TrustedAuth{}, nil
+}
+
+type noAuthLoginMessage struct {
 	Cmd    string `json:"cmd"`
 	Player Player `json:"player"`
 }
 
-func NoAuthLogin(c *Client, msg []byte) error {
-	var cmd LoginMessage
+func (auth TrustedAuth) authenticate(c *Client, msg []byte) (*Player, error) {
+	var cmd noAuthLoginMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if cmd.Player.FullName == "" {
-		return errors.New("fullName is required")
+		return nil, errors.New("fullName is required")
 	}
 
 	cmd.Player.Id = c.remoteHost
-	c.player = cmd.Player
-
-	g, _ := json.Marshal(cmd)
-	c.send <- g
-	return nil
+	return &c.player, nil
 }

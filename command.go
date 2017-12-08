@@ -34,7 +34,6 @@ var commands = map[string]Command{
 	"leave_table":     LeaveTable,
 	"list_games":      ListGames,
 	"list_locations":  ListLocations,
-	"login":           NoAuthLogin,
 	"logout":          Logout,
 	"new_game":        NewGame,
 	"save_game":       SaveGame,
