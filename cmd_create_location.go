@@ -9,7 +9,7 @@ type CreateLocationMessage struct {
 	Location string `json:"location"`
 }
 
-func CreateLocation(c *Client, msg []byte) error {
+func CreateLocation(c Client, msg []byte) error {
 	var cmd CreateLocationMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
@@ -29,7 +29,6 @@ func CreateLocation(c *Client, msg []byte) error {
 	Locations = append(Locations, cmd.Location)
 
 	saveState()
-	g, _ := json.Marshal(LocationsMessage{"locations", Locations})
-	c.hub.broadcast <- g
-	return nil
+
+	return hub.Broadcast(LocationsMessage{"locations", Locations})
 }

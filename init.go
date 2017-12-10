@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -16,7 +15,7 @@ var Tables []Table
 var Notifiers = make(map[string]Notifier)
 var Notifications map[string][]Player
 
-type implEntry struct {
+type ImplEntry struct {
 	Type   string
 	config *json.RawMessage
 }
@@ -24,8 +23,8 @@ type implEntry struct {
 type config struct {
 	Secret         string
 	SiteUrl        string
-	Authentication map[string]implEntry
-	Notifications  map[string]implEntry
+	Authentication map[string]ImplEntry
+	Notifications  map[string]ImplEntry
 }
 
 type memory struct {
@@ -54,39 +53,10 @@ func readConfig() {
 		log.Fatalf("Can't read config.json: %s", err)
 	}
 
-	for k := range conf.Authentication {
-		auth := conf.Authentication[k]
-		var impl Authentication
-		switch auth.Type {
-		case "LDAPAuth":
-			impl, err = NewLDAPAuth(auth.config)
-		case "TrustedAuth":
-			impl, err = NewTrustedAuth()
-		default:
-			log.Fatal("Unknown authentication implementation '%s'", auth.Type)
-		}
-		if err != nil {
-			log.Fatal("Can't create '%s' of type %s: %s", k, auth.Type, err.Error())
-		}
-	}
-	for k := range conf.Notifications {
-		var note Notifier
-		notifier := conf.Notifications[k]
-		switch notifier.Type {
-		case "http":
-			note, err = NewNotifyHttp(notifier.config)
-		case "smtp":
-			note, err = NewNotifySmtp(notifier)
-		default:
-			err = errors.New(fmt.Sprintf("Unknown type '%s'", notifier["type"]))
-		}
-		if err != nil {
-			log.Fatal(fmt.Sprintf("Error in config.json/notifications/%s: %s", k, err.Error()))
-		}
-		Notifiers[k] = note
-	}
 	secret = conf.Secret
 	SiteUrl = conf.SiteUrl
+	ConfigureAuthentication(conf.Authentication)
+	ConfigureNotifications(conf.Notifications)
 }
 
 func readState() {

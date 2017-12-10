@@ -11,22 +11,17 @@ func NewTrustedAuth() (TrustedAuth, error) {
 	return TrustedAuth{}, nil
 }
 
-type noAuthLoginMessage struct {
-	Cmd    string `json:"cmd"`
-	Player Player `json:"player"`
-}
-
-func (auth TrustedAuth) authenticate(c *Client, msg []byte) (*Player, error) {
-	var cmd noAuthLoginMessage
+func (auth TrustedAuth) authenticate(c Client, msg []byte) (*Player, error) {
+	var cmd passwordLoginMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
 		return nil, err
 	}
 
-	if cmd.Player.FullName == "" {
-		return nil, errors.New("fullName is required")
+	if cmd.Username == "" {
+		return nil, errors.New("username is required")
 	}
 
-	cmd.Player.Id = c.remoteHost
-	return &c.player, nil
+	player := Player{FullName: cmd.Username, Id: c.host()}
+	return &player, nil
 }

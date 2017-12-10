@@ -11,7 +11,7 @@ type SaveGameMessage struct {
 	Game Game `json:"game"`
 }
 
-func SaveGame(c *Client, msg []byte) error {
+func SaveGame(c Client, msg []byte) error {
 	var cmd SaveGameMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
@@ -37,7 +37,5 @@ func SaveGame(c *Client, msg []byte) error {
 
 	Games[cmd.Game.Id] = cmd.Game
 	saveState()
-	g, _ := json.Marshal(GamesMessage{"games", Games})
-	c.hub.broadcast <- g
-	return nil
+	return hub.Broadcast(GamesMessage{"games", Games})
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -9,12 +10,16 @@ import (
 )
 
 type NotifyHttp struct {
-	Url     string
-	Message string
+	Url     string `json:"url"`
+	Message string `json:"message"`
 }
 
-func NewNotifyHttp(conf map[string]string) (NotifyHttp, error) {
-	nh := NotifyHttp{conf["url"], conf["message"]}
+func NewNotifyHttp(conf *json.RawMessage) (NotifyHttp, error) {
+	var nh NotifyHttp
+	err := json.Unmarshal(*conf, &nh)
+	if err != nil {
+		return nh, err
+	}
 	if nh.Url == "" {
 		return nh, errors.New("Missing 'url'")
 	}

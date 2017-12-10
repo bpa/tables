@@ -100,7 +100,6 @@ func RemoveExpiredTables() {
 	}
 	if removed {
 		saveState()
-		g, _ := json.Marshal(GetTables())
-		hub.broadcast <- g
+		hub.Broadcast(GetTables())
 	}
 }

@@ -52,8 +52,8 @@ func NewLDAPAuth(config *json.RawMessage) (LDAPAuth, error) {
 	return auth, nil
 }
 
-func (auth LDAPAuth) authenticate(client *Client, packet []byte) (*Player, error) {
-	var msg PasswordLoginMessage
+func (auth LDAPAuth) authenticate(client Client, packet []byte) (*Player, error) {
+	var msg passwordLoginMessage
 	err := json.Unmarshal(packet, &msg)
 	if err != nil {
 		return nil, err

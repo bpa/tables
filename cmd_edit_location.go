@@ -10,7 +10,7 @@ type EditLocationMessage struct {
 	To   string `json:"to"`
 }
 
-func EditLocation(c *Client, msg []byte) error {
+func EditLocation(c Client, msg []byte) error {
 	var cmd EditLocationMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
@@ -29,9 +29,7 @@ func EditLocation(c *Client, msg []byte) error {
 		if cmd.From == Locations[i] {
 			Locations[i] = cmd.To
 			saveState()
-			g, _ := json.Marshal(LocationsMessage{"locations", Locations})
-			c.hub.broadcast <- g
-			return nil
+			return hub.Broadcast(LocationsMessage{"locations", Locations})
 		}
 	}
 	return errors.New("Location does not exist")

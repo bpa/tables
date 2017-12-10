@@ -9,7 +9,7 @@ type DeleteGameMessage struct {
 	Game string `json:"game"`
 }
 
-func DeleteGame(c *Client, msg []byte) error {
+func DeleteGame(c Client, msg []byte) error {
 	var cmd DeleteGameMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
@@ -24,9 +24,7 @@ func DeleteGame(c *Client, msg []byte) error {
 	if ok {
 		delete(Games, cmd.Game)
 		saveState()
-		g, _ := json.Marshal(GamesMessage{"games", Games})
-		c.hub.broadcast <- g
-		return nil
+		return hub.Broadcast(GamesMessage{"games", Games})
 	}
 	return errors.New("Game does not exist")
 }
