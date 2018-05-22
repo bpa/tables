@@ -104,7 +104,12 @@ func serveWs(hub *WSHub, w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	client := &WSClient{conn: conn, output: make(chan []byte, 256), remoteHost: r.Header.Get("X-Forwarded-For")}
+	client := &WSClient{
+		conn:       conn,
+		output:     make(chan []byte, 256),
+		remoteHost: r.Header.Get("X-Forwarded-For"),
+		hub:        hub,
+	}
 	if client.remoteHost == "" {
 		addr := conn.RemoteAddr().String()
 		i := strings.LastIndexByte(addr, ':')
@@ -115,8 +120,8 @@ func serveWs(hub *WSHub, w http.ResponseWriter, r *http.Request) {
 	}
 	client.hub.register <- client
 
-	client.send(GetTables())
-
 	go client.writePump()
 	go client.readPump()
+
+	client.send(GetTables())
 }

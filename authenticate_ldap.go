@@ -28,9 +28,9 @@ func getOrDefault(m map[string]string, k, d string) string {
 	return d
 }
 
-func NewLDAPAuth(config *json.RawMessage) (LDAPAuth, error) {
+func NewLDAPAuth(config json.RawMessage) (LDAPAuth, error) {
 	var auth LDAPAuth
-	err := json.Unmarshal(*config, &auth)
+	err := json.Unmarshal(config, &auth)
 	if err != nil {
 		return auth, err
 	}

@@ -13,7 +13,7 @@ type authenticationMessage struct {
 
 type passwordLoginMessage struct {
 	Cmd      string `json:"cmd"`
-	Type     string `json:"Type"`
+	Type     string `json:"type"`
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
@@ -36,7 +36,7 @@ func ConfigureAuthentication(authentication map[string]ImplEntry) {
 		var impl Authentication
 		switch auth.Type {
 		case "LDAPAuth":
-			impl, err = NewLDAPAuth(auth.config)
+			impl, err = NewLDAPAuth(auth.Config)
 		case "TrustedAuth":
 			impl, err = NewTrustedAuth()
 		default:
@@ -68,7 +68,6 @@ func Login(c Client, msg []byte) error {
 	res := authenticatedResponse{"login", *player}
 	c.setPlayer(player)
 
-	g, _ := json.Marshal(res)
-	c.send(&g)
+	c.send(res)
 	return nil
 }

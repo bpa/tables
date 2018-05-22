@@ -16,8 +16,8 @@ var Notifiers = make(map[string]Notifier)
 var Notifications map[string][]Player
 
 type ImplEntry struct {
-	Type   string
-	config *json.RawMessage
+	Type   string          `json:"type"`
+	Config json.RawMessage `json:"config"`
 }
 
 type config struct {

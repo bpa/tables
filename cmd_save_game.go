@@ -32,7 +32,7 @@ func SaveGame(c Client, msg []byte) error {
 
 	_, ok := Games[cmd.Game.Id]
 	if !ok {
-		cmd.Game.Id = uuid.NewV4().String()
+		cmd.Game.Id = uuid.Must(uuid.NewV4()).String()
 	}
 
 	Games[cmd.Game.Id] = cmd.Game

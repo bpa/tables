@@ -32,7 +32,7 @@ func GetTables() TablesMessage {
 }
 
 func AddNewTable(game Game, loc string, start time.Time, players []Player) Table {
-	id := uuid.NewV4().String()
+	id := uuid.Must(uuid.NewV4()).String()
 	table := Table{
 		Game:     game,
 		Players:  players,

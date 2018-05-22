@@ -13,9 +13,9 @@ type NotifySmtp struct {
 	Email string
 }
 
-func NewNotifySmtp(conf *json.RawMessage) (NotifySmtp, error) {
+func NewNotifySmtp(conf json.RawMessage) (NotifySmtp, error) {
 	var ns NotifySmtp
-	err := json.Unmarshal(*conf, &ns)
+	err := json.Unmarshal(conf, &ns)
 	if err != nil {
 		return ns, err
 	}

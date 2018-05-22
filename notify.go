@@ -27,9 +27,9 @@ func ConfigureNotifications(notifications map[string]ImplEntry) {
 		notifier := notifications[k]
 		switch notifier.Type {
 		case "http":
-			note, err = NewNotifyHttp(notifier.config)
+			note, err = NewNotifyHttp(notifier.Config)
 		case "smtp":
-			note, err = NewNotifySmtp(notifier.config)
+			note, err = NewNotifySmtp(notifier.Config)
 		default:
 			err = errors.New(fmt.Sprintf("Unknown type '%s'", notifier.Type))
 		}

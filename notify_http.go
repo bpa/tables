@@ -14,9 +14,9 @@ type NotifyHttp struct {
 	Message string `json:"message"`
 }
 
-func NewNotifyHttp(conf *json.RawMessage) (NotifyHttp, error) {
+func NewNotifyHttp(conf json.RawMessage) (NotifyHttp, error) {
 	var nh NotifyHttp
-	err := json.Unmarshal(*conf, &nh)
+	err := json.Unmarshal(conf, &nh)
 	if err != nil {
 		return nh, err
 	}
