@@ -32,7 +32,8 @@ class Login extends React.Component {
     this.setState({open: false});
   }
 
-  login() {
+  login(e) {
+    e.preventDefault();
     ws.send({cmd: 'login', type: 'trusted', username: this.state.name});
   }
 
@@ -69,7 +70,7 @@ class Login extends React.Component {
             <DialogContentText>
               For the short term, we'll just need your name as other people know it.
             </DialogContentText>
-            <form noValidate autoComplete="off">
+            <form noValidate autoComplete="off" onSubmit={this.login}>
               <TextField id="name" label="Name" margin="normal" style={{width:'100%'}}
                 value={this.state.name}
                 onChange={this.on_change.bind(this, 'name')}
