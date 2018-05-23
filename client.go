@@ -19,15 +19,21 @@ const (
 
 var upgrader = websocket.Upgrader{}
 
-type Client struct {
-	hub        *Hub
-	conn       *websocket.Conn
-	player     Player
-	send       chan []byte
-	remoteHost string
+type Client interface {
+	setPlayer(*Player)
+	send(interface{}) error
+	host() string
 }
 
-func (c *Client) readPump() {
+type WSClient struct {
+	conn       *websocket.Conn
+	player     Player
+	output     chan []byte
+	remoteHost string
+	hub        *WSHub
+}
+
+func (c *WSClient) readPump() {
 	defer func() {
 		c.hub.unregister <- c
 		c.conn.Close()
@@ -47,7 +53,7 @@ func (c *Client) readPump() {
 	}
 }
 
-func (c *Client) writePump() {
+func (c WSClient) writePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -55,7 +61,7 @@ func (c *Client) writePump() {
 	}()
 	for {
 		select {
-		case message, ok := <-c.send:
+		case message, ok := <-c.output:
 			c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				c.conn.WriteMessage(websocket.CloseMessage, []byte{})
@@ -75,13 +81,35 @@ func (c *Client) writePump() {
 	}
 }
 
-func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func (c WSClient) send(v interface{}) error {
+	g, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+	c.output <- g
+	return nil
+}
+
+func (c WSClient) host() string {
+	return c.remoteHost
+}
+
+func (c WSClient) setPlayer(p *Player) {
+	c.player = *p
+}
+
+func serveWs(hub *WSHub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), remoteHost: r.Header.Get("X-Forwarded-For")}
+	client := &WSClient{
+		conn:       conn,
+		output:     make(chan []byte, 256),
+		remoteHost: r.Header.Get("X-Forwarded-For"),
+		hub:        hub,
+	}
 	if client.remoteHost == "" {
 		addr := conn.RemoteAddr().String()
 		i := strings.LastIndexByte(addr, ':')
@@ -92,9 +120,8 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	client.hub.register <- client
 
-	msg, _ := json.Marshal(GetTables())
-	client.send <- msg
-
 	go client.writePump()
 	go client.readPump()
+
+	client.send(GetTables())
 }

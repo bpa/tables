@@ -7,7 +7,7 @@ import (
 )
 
 var addr = flag.String("addr", ":8080", "http service address")
-var hub *Hub
+var hub Hub
 
 func main() {
 	flag.Parse()
@@ -15,11 +15,12 @@ func main() {
 	loadStartupFiles()
 	startCleaner()
 
-	hub = newHub()
-	go hub.run()
+	wsHub := newWSHub()
+	hub = wsHub
+	go wsHub.run()
 
 	http.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(hub, w, r)
+		serveWs(wsHub, w, r)
 	})
 	http.Handle("/", http.FileServer(http.Dir("dist")))
 

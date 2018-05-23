@@ -2,24 +2,23 @@ package main
 
 import (
 	"crypto/tls"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"log"
 
 	"gopkg.in/ldap.v2"
 )
 
-type LDAPConfig struct {
-	addr           string
-	baseDN         string
-	filter         string
-	network        string
-	usernameFormat string
-	email          string
-	firstName      string
-	fullName       string
+type LDAPAuth struct {
+	Addr           string `json:"addr"`
+	BaseDN         string `json:"baseDN"`
+	Filter         string `json:"filter"`
+	Network        string `json:"network"`
+	UsernameFormat string `json:"usernameFormat"`
+	Email          string `json:"email"`
+	FirstName      string `json:"firstName"`
+	FullName       string `json:"FullName"`
 }
-
-var ldapConfig LDAPConfig
 
 func getOrDefault(m map[string]string, k, d string) string {
 	v, ok := m[k]
@@ -29,25 +28,40 @@ func getOrDefault(m map[string]string, k, d string) string {
 	return d
 }
 
-func LDAPInit(conf map[string]string) {
-	ldapConfig.network = getOrDefault(conf, "network", "tcp")
-	ldapConfig.addr = getOrDefault(conf, "addr", "ldap:389")
-	ldapConfig.usernameFormat = getOrDefault(conf, "userFormat", "%s")
-	ldapConfig.filter = getOrDefault(conf, "filter", "(sAMAccountName=%s)")
-	ldapConfig.baseDN = conf["baseDN"]
-	if ldapConfig.baseDN == "" {
-		log.Fatal("Missing authentication/baseDN in config.json")
-	}
-}
-
-func LDAPLogin(*Client, []byte) error {
-	return nil
-}
-
-func authenticateLDAP(username, password string) (*Player, error) {
-	l, err := ldap.Dial(ldapConfig.network, ldapConfig.addr)
+func NewLDAPAuth(config json.RawMessage) (LDAPAuth, error) {
+	var auth LDAPAuth
+	err := json.Unmarshal(config, &auth)
 	if err != nil {
-		log.Fatal(err)
+		return auth, err
+	}
+	if len(auth.Network) == 0 {
+		auth.Network = "tcp"
+	}
+	if len(auth.Addr) == 0 {
+		auth.Addr = "ldap:389"
+	}
+	if len(auth.UsernameFormat) == 0 {
+		auth.UsernameFormat = "%s"
+	}
+	if len(auth.Filter) == 0 {
+		auth.Filter = "(sAMAccountName=%s)"
+	}
+	if len(auth.BaseDN) == 0 {
+		return auth, errors.New("Missing baseDN")
+	}
+	return auth, nil
+}
+
+func (auth LDAPAuth) authenticate(client Client, packet []byte) (*Player, error) {
+	var msg passwordLoginMessage
+	err := json.Unmarshal(packet, &msg)
+	if err != nil {
+		return nil, err
+	}
+
+	l, err := ldap.Dial(auth.Network, auth.Addr)
+	if err != nil {
+		return nil, err
 	}
 	defer l.Close()
 
@@ -56,36 +70,36 @@ func authenticateLDAP(username, password string) (*Player, error) {
 		return nil, err
 	}
 
-	err = l.Bind(fmt.Sprintf(ldapConfig.usernameFormat, username), password)
+	err = l.Bind(fmt.Sprintf(auth.UsernameFormat, msg.Username), msg.Password)
 	if err != nil {
 		return nil, err
 	}
 
 	searchRequest := ldap.NewSearchRequest(
-		ldapConfig.baseDN,
+		auth.BaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		fmt.Sprintf(ldapConfig.filter, username),
+		fmt.Sprintf(auth.Filter, msg.Username),
 		[]string{
-			ldapConfig.email,
-			ldapConfig.firstName,
-			ldapConfig.fullName},
+			auth.Email,
+			auth.FirstName,
+			auth.FullName},
 		nil,
 	)
 
 	sr, err := l.Search(searchRequest)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	if len(sr.Entries) != 1 {
-		log.Fatal("User does not exist or too many entries returned")
+		return nil, errors.New("User does not exist")
 	}
 
 	p := sr.Entries[0]
 	return &Player{
-			p.GetAttributeValue(ldapConfig.firstName),
-			p.GetAttributeValue(ldapConfig.fullName),
-			p.GetAttributeValue(ldapConfig.email),
-			p.GetAttributeValue(ldapConfig.email)},
+			p.GetAttributeValue(auth.FirstName),
+			p.GetAttributeValue(auth.FullName),
+			p.GetAttributeValue(auth.Email),
+			p.GetAttributeValue(auth.Email)},
 		nil
 }

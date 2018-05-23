@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/smtp"
@@ -12,8 +13,12 @@ type NotifySmtp struct {
 	Email string
 }
 
-func NewNotifySmtp(conf map[string]string) (NotifySmtp, error) {
-	ns := NotifySmtp{conf["host"], conf["email"]}
+func NewNotifySmtp(conf json.RawMessage) (NotifySmtp, error) {
+	var ns NotifySmtp
+	err := json.Unmarshal(conf, &ns)
+	if err != nil {
+		return ns, err
+	}
 	if ns.Host == "" {
 		return ns, errors.New("Missing 'host'")
 	}

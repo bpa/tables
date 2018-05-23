@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-func DeleteLocation(c *Client, msg []byte) error {
+func DeleteLocation(c Client, msg []byte) error {
 	var cmd CreateLocationMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
@@ -20,9 +20,7 @@ func DeleteLocation(c *Client, msg []byte) error {
 		if cmd.Location == Locations[i] {
 			Locations = append(Locations[:i], Locations[i+1:]...)
 			saveState()
-			g, _ := json.Marshal(LocationsMessage{"locations", Locations})
-			c.hub.broadcast <- g
-			return nil
+			return hub.Broadcast(LocationsMessage{"locations", Locations})
 		}
 	}
 	return errors.New("Location does not exist")

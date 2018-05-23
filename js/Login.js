@@ -34,7 +34,7 @@ class Login extends React.Component {
 
   login(e) {
     e.preventDefault();
-    ws.send({cmd: 'login', player: {fullName:this.state.name}});
+    ws.send({cmd: 'login', type: 'trusted', username: this.state.name});
   }
 
   on_change(k, e) {

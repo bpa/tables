@@ -14,7 +14,7 @@ type CreateTableMessage struct {
 	Player   Player    `json:"player"`
 }
 
-func CreateTable(c *Client, msg []byte) error {
+func CreateTable(c Client, msg []byte) error {
 	var cmd CreateTableMessage
 	err := json.Unmarshal(msg, &cmd)
 	if err != nil {
@@ -47,9 +47,7 @@ func CreateTable(c *Client, msg []byte) error {
 
 	table := AddNewTable(game, cmd.Location, cmd.Start, players)
 
-	g, _ := json.Marshal(GetTables())
-	c.hub.broadcast <- g
-
 	go NotifyNewTable(&table, &cmd.Player)
-	return nil
+
+	return hub.Broadcast(GetTables())
 }
