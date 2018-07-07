@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import ws from './Socket';
-import { AppBar, Button, Divider, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography } from 'material-ui';
+import { AppBar, Button, Divider, List, ListItem, ListItemIcon, ListItemText, Paper, Toolbar, Typography } from '@material-ui/core';
 import CreateTable from './CreateTable';
 import MainMenu from './MainMenu';
 import Table from './Table';
@@ -38,7 +38,7 @@ class Client extends React.Component {
           </Toolbar>
         </AppBar>
         <div style={{display:'flex',alignItems:'flex-start'}}>
-          {this.state.tables.map((t) => <Table table={t} key={t.game.name}/>)}
+          {this.state.tables.map((t) => <Table table={t} key={t.id}/>)}
           <CreateTable/>
         </div>
       </div>

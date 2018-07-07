@@ -1,10 +1,10 @@
 import React from 'react';
-import MenuIcon from 'material-ui-icons/Menu';
-import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemIcon, ListItemText, TextField, Toolbar, Typography } from 'material-ui';
-import Menu, { MenuItem } from 'material-ui/Menu';
+import MenuIcon from '@material-ui/icons/Menu';
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemIcon, ListItemText, TextField, Toolbar, Typography } from '@material-ui/core';
+import Menu, { MenuItem } from '@material-ui/core/Menu';
 import ws from './Socket';
-import CloseIcon from 'material-ui-icons/Close';
-import Slide from 'material-ui/transitions/Slide';
+import CloseIcon from '@material-ui/icons/Close';
+import Slide from '@material-ui/core/Slide';
 import GameItem from './GameItem';
 import GameDialog from './GameDialog';
 import Location from './Location';
@@ -73,12 +73,12 @@ export default class EditLocations extends React.Component {
     return (
       <Dialog fullScreen
         open={this.props.open}
-        onRequestClose={this.props.onRequestClose}
-        transition={Up}
+        onClose={this.props.onClose}
+        TransitionComponent={Up}
       >
         <AppBar position="static">
           <Toolbar>
-            <IconButton color="contrast" onClick={this.props.onRequestClose}>
+            <IconButton color="inherit" onClick={this.props.onClose}>
               <CloseIcon/>
             </IconButton>
             <Typography type="title" color="inherit">
@@ -105,7 +105,7 @@ export default class EditLocations extends React.Component {
             <Button onClick={this.add_location}>Add</Button>
           </ListItem>
         </List>
-				<Dialog open={this.state.open} onRequestClose={this.cancel_delete}>
+				<Dialog open={this.state.open} onClose={this.cancel_delete}>
           <DialogTitle>Confirm Deletion</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -113,7 +113,7 @@ export default class EditLocations extends React.Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.cancel_delete} color="accent">
+            <Button onClick={this.cancel_delete} color="secondary">
               Cancel
             </Button>
             <Button onClick={this.delete_location} color="primary" autoFocus>

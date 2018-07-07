@@ -1,9 +1,9 @@
 import React from 'react';
-import { Button, Card, CardContent, CardActions, Divider, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from 'material-ui';
-import People from 'material-ui-icons/People';
-import Event from 'material-ui-icons/Event';
-import Schedule from 'material-ui-icons/Schedule';
-import Room from 'material-ui-icons/Room';
+import { Button, Card, CardContent, CardActions, Divider, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@material-ui/core';
+import People from '@material-ui/icons/People';
+import Event from '@material-ui/icons/Event';
+import Schedule from '@material-ui/icons/Schedule';
+import Room from '@material-ui/icons/Room';
 import moment from 'moment';
 import { player } from './Login';
 import ws from './Socket';
@@ -11,7 +11,7 @@ import ws from './Socket';
 function Player(props) {
   let name = props.player ? props.player.fullName || '' : '';
   return (
-    <ListItem dense>
+    <ListItem dense={true}>
       <ListItemText secondary={props.i + '.'}/>
       <ListItemText primary={name}/>
     </ListItem>
@@ -29,13 +29,11 @@ function Players(props) {
 }
 
 function leave_table() {
-  console.log("leave", this);
-  ws.send({cmd:'leave_table', id: this.id, player: player.data});
+  ws.send({cmd:'leave_table', id: this.id});
 }
 
 function join_table() {
-  console.log("join", this);
-  ws.send({cmd:'join_table', id: this.id, player: player.data});
+  ws.send({cmd:'join_table', id: this.id});
 }
 
 export default function Table(props) {
@@ -51,7 +49,7 @@ export default function Table(props) {
   return (
     <Card elevation={4} style={{padding:4,margin:8}}>
       <CardContent>
-        <List dense>
+        <List dense={true}>
           <ListItem>
             <ListItemIcon><Event/></ListItemIcon>
             <ListItemText primary={table.game.name}/>
@@ -74,8 +72,8 @@ export default function Table(props) {
       </CardContent>
       <CardActions>
       {join
-        ? <Button dense onClick={join_table.bind(table)}>Join</Button>
-        : <Button dense onClick={leave_table.bind(table)}>Leave</Button>
+        ? <Button dense="true" onClick={join_table.bind(table)}>Join</Button>
+        : <Button dense="true" onClick={leave_table.bind(table)}>Leave</Button>
       }
       </CardActions>
     </Card>

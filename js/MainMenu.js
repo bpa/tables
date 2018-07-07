@@ -1,7 +1,8 @@
 import React from 'react';
-import MenuIcon from 'material-ui-icons/Menu';
-import { IconButton } from 'material-ui';
-import Menu, { MenuItem } from 'material-ui/Menu';
+import MenuIcon from '@material-ui/icons/Menu';
+import { IconButton } from '@material-ui/core';
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import ws from './Socket';
 import EditGames from './EditGames';
 import EditLocations from './EditLocations';
@@ -41,23 +42,23 @@ export default class MainMenu extends React.Component {
   render() {
     return (
       <div>
-        <IconButton color="contrast" aria-label="Menu"
+        <IconButton color="inherit" aria-label="Menu"
             style={{marginLeft:-12, marginRight:20}}
             onClick={this.openMenu}>
           <MenuIcon/>
         </IconButton>
         <Menu id="main-menu" anchorEl={this.state.anchor}
           open={this.state.open}
-          onRequestClose={this.closeMenu}
+          onClose={this.closeMenu}
         >
           <MenuItem onClick={this.edit.bind(this, 'games')}>Edit Games</MenuItem>
           <MenuItem onClick={this.edit.bind(this, 'locations')}>Edit Locations</MenuItem>
           <MenuItem onClick={this.logout}>Log out</MenuItem>
         </Menu>
         <EditGames open={this.state.type === 'games'}
-          onRequestClose={this.stopEditing}/>
+          onClose={this.stopEditing}/>
         <EditLocations open={this.state.type === 'locations'}
-          onRequestClose={this.stopEditing}/>
+          onClose={this.stopEditing}/>
       </div>
     );
   }

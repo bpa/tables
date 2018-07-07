@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography } from 'material-ui';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography } from '@material-ui/core';
 import ws from './Socket';
 
 var player = {};
@@ -16,6 +16,7 @@ class Login extends React.Component {
     let state = {open:false, name:''};
     if (window.localStorage.player) {
       state.player = JSON.parse(window.localStorage.player);
+      state.name = state.player.fullName;
       player.data = state.player;
     }
     else {
@@ -34,7 +35,7 @@ class Login extends React.Component {
 
   login(e) {
     e.preventDefault();
-    ws.send({cmd: 'login', type: 'trusted', username: this.state.name});
+    ws.send({cmd: 'login', method: 'trusted', username: this.state.name});
   }
 
   on_change(k, e) {
@@ -63,7 +64,7 @@ class Login extends React.Component {
     }
     return (
       <div>
-        <Button color="contrast" onClick={this.open}>Login</Button>
+        <Button color="inherit" onClick={this.open}>Login</Button>
         <Dialog open={this.state.open}>
           <DialogTitle>Login</DialogTitle>
           <DialogContent>

@@ -1,6 +1,8 @@
 class Socket {
   constructor(obj) {
+    this.open = false;
     this.initialized = false;
+    this.buffer = [];
     this.callbacks = {};
     this.callbackIds = {};
     this.id = 0;
@@ -31,11 +33,27 @@ class Socket {
   }
 
   init() {
+    let self = this;
     let path = location.toString()
       .replace(/https?/, 'ws').replace(/\?.*$/,'') + 'websocket';
     this.ws = new WebSocket(path);
     this.ws.onmessage = this.handle_message.bind(this);
-    this.ws.onclose = () => setTimeout(this.init.bind(this), 1000);
+    this.ws.onopen = function() {
+      self.open = true;
+      let buf = self.buffer;
+      self.buffer = [];
+      let player = JSON.parse(window.localStorage.player);
+      if (player) {
+        self.send({cmd: 'login', method: 'trusted', username: player.fullName});
+      }
+      for (var m of buf) {
+        self.ws.send(JSON.stringify(m));
+      }
+    }
+    this.ws.onclose = function() {
+      self.open = false;
+      setTimeout(self.init.bind(self), 1000);
+    }
   }
 
   close() {
@@ -45,7 +63,12 @@ class Socket {
 
   send(msg) {
     console.log(msg);
-    this.ws.send(JSON.stringify(msg));
+    if (this.open) {
+      this.ws.send(JSON.stringify(msg));
+    }
+    else {
+      this.buffer.push(msg);
+    }
   }
 
   handle_message(m) {

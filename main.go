@@ -1,31 +1,25 @@
 package main
 
 import (
-	"flag"
 	"log"
-	"net/http"
+
+	"github.com/bpa/tables/data"
+	"github.com/bpa/tables/notify"
+	"github.com/bpa/tables/server"
+	"github.com/spf13/pflag"
+	"github.com/spf13/viper"
 )
 
-var addr = flag.String("addr", ":8080", "http service address")
-var hub Hub
-
 func main() {
-	flag.Parse()
-
-	loadStartupFiles()
-	startCleaner()
-
-	wsHub := newWSHub()
-	hub = wsHub
-	go wsHub.run()
-
-	http.HandleFunc("/websocket", func(w http.ResponseWriter, r *http.Request) {
-		serveWs(wsHub, w, r)
-	})
-	http.Handle("/", http.FileServer(http.Dir("dist")))
-
-	err := http.ListenAndServe(*addr, nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+	pflag.IntP("port", "p", 3000, "help message for flagname")
+	pflag.Parse()
+	viper.BindPFlags(pflag.CommandLine)
+	viper.SetConfigName("config")
+	viper.AddConfigPath(".")
+	if err := viper.ReadInConfig(); err != nil {
+		log.Fatalf("Error reading config: %s", err)
 	}
+	data.Initialize()
+	notify.Initialize()
+	server.Listen(viper.GetInt("port"))
 }

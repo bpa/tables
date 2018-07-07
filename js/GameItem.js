@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ListItem, ListItemText } from 'material-ui';
-import Delete from 'material-ui-icons/Delete';
-import Edit from 'material-ui-icons/Edit';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ListItem, ListItemText } from '@material-ui/core';
+import Delete from '@material-ui/icons/Delete';
+import Edit from '@material-ui/icons/Edit';
 import GameDialog from './GameDialog';
 import ws from './Socket';
 
@@ -51,8 +51,8 @@ export default class GameItem extends React.Component {
           <ListItemText primary={game.name}/>
         </ListItem>
         <GameDialog game={game} title="Edit Game"
-          open={this.state.open} onRequestClose={this.cancel}/>
-				<Dialog open={this.state.confirming} onRequestClose={this.delete_cancel}>
+          open={this.state.open} onClose={this.cancel}/>
+				<Dialog open={this.state.confirming} onClose={this.delete_cancel}>
           <DialogTitle>Confirm Deletion</DialogTitle>
           <DialogContent>
             <DialogContentText>
@@ -60,7 +60,7 @@ export default class GameItem extends React.Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.delete_cancel} color="accent">
+            <Button onClick={this.delete_cancel} color="secondary">
               Cancel
             </Button>
             <Button onClick={this.delete_confirmed} color="primary" autoFocus>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, IconButton, ListItem, ListItemIcon, ListItemText, TextField } from 'material-ui';
-import Edit from 'material-ui-icons/Edit';
-import Delete from 'material-ui-icons/Delete';
+import { Button, IconButton, ListItem, ListItemIcon, ListItemText, TextField } from '@material-ui/core';
+import Edit from '@material-ui/icons/Edit';
+import Delete from '@material-ui/icons/Delete';
 
 export default class Location extends React.Component {
   constructor(props) {
@@ -38,7 +38,7 @@ export default class Location extends React.Component {
           onChange={this.change}
         />
         <Button color="primary" onClick={this.save}>Save</Button>
-        <Button color="accent" onClick={this.props.cancel}>Cancel</Button>
+        <Button color="secondary" onClick={this.props.cancel}>Cancel</Button>
       </ListItem>
     );
   }

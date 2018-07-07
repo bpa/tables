@@ -1,10 +1,10 @@
 import React from 'react';
-import MenuIcon from 'material-ui-icons/Menu';
-import { AppBar, Dialog, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from 'material-ui';
-import Menu, { MenuItem } from 'material-ui/Menu';
+import MenuIcon from '@material-ui/icons/Menu';
+import { AppBar, Dialog, IconButton, List, ListItem, ListItemIcon, ListItemText, Toolbar, Typography } from '@material-ui/core';
+import Menu, { MenuItem } from '@material-ui/core/Menu';
 import ws from './Socket';
-import CloseIcon from 'material-ui-icons/Close';
-import Slide from 'material-ui/transitions/Slide';
+import CloseIcon from '@material-ui/icons/Close';
+import Slide from '@material-ui/core/Slide';
 import GameItem from './GameItem';
 import GameDialog from './GameDialog';
 
@@ -45,12 +45,12 @@ export default class EditGames extends React.Component {
     return (
       <Dialog fullScreen
         open={this.props.open}
-        onRequestClose={this.props.onRequestClose}
-        transition={Up}
+        onClose={this.props.onClose}
+        TransitionComponent={Up}
       >
         <AppBar position="static">
           <Toolbar>
-            <IconButton color="contrast" onClick={this.props.onRequestClose}>
+            <IconButton color="inherit" onClick={this.props.onClose}>
               <CloseIcon/>
             </IconButton>
             <Typography type="title" color="inherit">
@@ -64,7 +64,7 @@ export default class EditGames extends React.Component {
             <ListItemText primary="Add new game"/>
           </ListItem>
           <GameDialog game={{name:'', min:2, max:10}} title="New Game"
-            open={this.state.open} onRequestClose={this.cancel.bind(this)} />
+            open={this.state.open} onClose={this.cancel.bind(this)} />
         </List>
       </Dialog>
     );

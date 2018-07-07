@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl,
-  IconButton, Input, InputLabel, MenuItem, Select, TextField } from 'material-ui';
+  IconButton, Input, InputLabel, MenuItem, Select, TextField } from '@material-ui/core';
 
-import AddIcon from 'material-ui-icons/Add';
+import AddIcon from '@material-ui/icons/Add';
 import ws from './Socket';
 import moment from 'moment';
 import { player } from './Login';
@@ -16,7 +16,14 @@ export default class CreateTable extends React.Component {
     this.state = {open: false};
     this.locCb = ws.register('locations', this.on_locations.bind(this));
     this.gameCb = ws.register('games', this.on_games.bind(this));
-    this.state = { locations: [], location: '', games: [], game: '', keys:[] };
+    this.state = {
+      game: '',
+      games: [],
+      keys:[],
+      location: '',
+      locations: [],
+      open: false,
+    };
   }
 
   componentWillUnmount() {
@@ -68,10 +75,10 @@ export default class CreateTable extends React.Component {
     let games = this.state.games;
     return (
       <div>
-        <Button fab style={{alignSelf:"center", margin:"100px"}} color="primary" aria-label="add" onClick={this.open}>
+        <Button variant="fab" style={{alignSelf:"center", margin:"100px"}} color="primary" aria-label="add" onClick={this.open}>
           <AddIcon/>
         </Button>
-        <Dialog open={this.state.open} onRequestClose={this.close}>
+        <Dialog open={this.state.open} onClose={this.close}>
           <DialogTitle>Create Table</DialogTitle>
           <DialogContent>
             <form noValidate autoComplete="off">
@@ -110,7 +117,7 @@ export default class CreateTable extends React.Component {
             </form>
           </DialogContent>
           <DialogActions>
-            <Button color="accent" onClick={this.close}>Cancel</Button>
+            <Button color="secondary" onClick={this.close}>Cancel</Button>
             <Button color="primary" onClick={this.create}>Create</Button>
           </DialogActions>
         </Dialog>

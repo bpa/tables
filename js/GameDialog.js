@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, ListItem, ListItemText, TextField } from 'material-ui';
-import Edit from 'material-ui-icons/Edit';
-import CloseIcon from 'material-ui-icons/Close';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, ListItem, ListItemText, TextField } from '@material-ui/core';
+import Edit from '@material-ui/icons/Edit';
+import CloseIcon from '@material-ui/icons/Close';
 import ws from './Socket';
 
 export default class GameItem extends React.Component {
@@ -23,7 +23,7 @@ export default class GameItem extends React.Component {
       max: parseInt(this.state.max),
       name: this.state.name,
     }});
-    this.props.onRequestClose()
+    this.props.onClose()
   }
 
   on_change(f, e) {
@@ -66,7 +66,7 @@ export default class GameItem extends React.Component {
           </form>
         </DialogContent>
         <DialogActions>
-          <Button color="accent" onClick={this.props.onRequestClose}>Cancel</Button>
+          <Button color="secondary" onClick={this.props.onClose}>Cancel</Button>
           <Button color="primary" onClick={this.update}>Update</Button>
         </DialogActions>
       </Dialog>
