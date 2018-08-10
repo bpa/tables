@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"time"
 
@@ -30,8 +31,9 @@ func Listen(port int) {
 	})
 	http.Handle("/", http.FileServer(http.Dir("dist")))
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
+	l, err := net.Listen("tcp4", fmt.Sprintf(":%d", port))
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
+	http.Serve(l, nil)
 }

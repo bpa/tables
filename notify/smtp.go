@@ -1,7 +1,6 @@
 package notify
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/smtp"
@@ -15,15 +14,13 @@ type NotifySmtp struct {
 	Email string
 }
 
-func NewNotifySmtp(conf json.RawMessage) (NotifySmtp, error) {
+func NewNotifySmtp(conf map[string]interface{}) (NotifySmtp, error) {
 	var ns NotifySmtp
-	err := json.Unmarshal(conf, &ns)
-	if err != nil {
-		return ns, err
-	}
+	ns.Host = getString(conf, "host")
 	if ns.Host == "" {
 		return ns, errors.New("Missing 'host'")
 	}
+	ns.Email = getString(conf, "email")
 	if ns.Email == "" {
 		return ns, errors.New("Missing 'email'")
 	}
@@ -31,8 +28,8 @@ func NewNotifySmtp(conf json.RawMessage) (NotifySmtp, error) {
 }
 
 func (ns NotifySmtp) NotifyNewTable(table *data.Table, author *data.Player, players *[]data.Player) {
-	msg := fmt.Sprintf("Subject: New Table\n\n%s created a table for %s at %s (%s)",
-		author.FullName, table.Game.Name, table.Start.Local().Format(time.Kitchen), siteUrl)
+	msg := fmt.Sprintf("From: %s\nSubject: New Table\n\n%s created a table for %s at %s (%s)",
+		ns.Email, author.FullName, table.Game.Name, table.Start.Local().Format(time.Kitchen), siteUrl)
 	c, err := smtp.Dial(ns.Host)
 	if err != nil {
 		return
