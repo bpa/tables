@@ -21,7 +21,7 @@ func Listen(port int) {
 	go func() {
 		for range ticker.C {
 			if data.DeleteExpiredTables() {
-				hub.Broadcast(data.GetTables())
+				hub.Broadcast(tablesMessage{"tables", data.GetTables()})
 			}
 		}
 	}()
