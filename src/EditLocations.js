@@ -1,17 +1,13 @@
 import React from 'react';
-import MenuIcon from '@material-ui/icons/Menu';
-import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, ListItemIcon, ListItemText, TextField, Toolbar, Typography } from '@material-ui/core';
-import Menu, { MenuItem } from '@material-ui/core/Menu';
+import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, TextField, Toolbar, Typography } from '@material-ui/core';
 import ws from './Socket';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
-import GameItem from './GameItem';
-import GameDialog from './GameDialog';
 import Location from './Location';
 
-function Up(props) {
-  return <Slide direction="up" {...props}/>;
-}
+const Up = React.forwardRef(function Up(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default class EditLocations extends React.Component {
   constructor(props) {
@@ -22,46 +18,46 @@ export default class EditLocations extends React.Component {
     this.complete_edit = this.complete_edit.bind(this);
     this.delete_location = this.delete_location.bind(this);
     this.lcb = ws.register('locations', this.on_locations.bind(this));
-    this.state = {locations: [], input: '', open:false};
+    this.state = { locations: [], input: '', open: false };
   }
 
   on_change(e) {
-    this.setState({input: e.target.value});
+    this.setState({ input: e.target.value });
   }
 
   on_locations(msg) {
-    this.setState({locations: msg.locations});
+    this.setState({ locations: msg.locations });
   }
 
   add_location() {
-    ws.send({cmd: "create_location", location: this.state.input});
-    this.setState({input: ''});
+    ws.send({ cmd: "create_location", location: this.state.input });
+    this.setState({ input: '' });
   }
 
   edit_location(l) {
-    this.setState({editing: l});
+    this.setState({ editing: l });
   }
 
   cancel_edit() {
-    this.setState({editing: null});
+    this.setState({ editing: null });
   }
 
   confirm_delete(l) {
-    this.setState({to_delete: l, open: true});
+    this.setState({ to_delete: l, open: true });
   }
 
   delete_location() {
-    ws.send({cmd:'delete_location', location: this.state.to_delete});
-    this.setState({open:false});
+    ws.send({ cmd: 'delete_location', location: this.state.to_delete });
+    this.setState({ open: false });
   }
 
   cancel_delete() {
-    this.setState({open: false});
+    this.setState({ open: false });
   }
 
   complete_edit(new_value) {
-    ws.send({cmd:'edit_location', from: this.state.editing, to:new_value});
-    this.setState({editing: null});
+    ws.send({ cmd: 'edit_location', from: this.state.editing, to: new_value });
+    this.setState({ editing: null });
   }
 
   componentWillUnmount() {
@@ -69,7 +65,6 @@ export default class EditLocations extends React.Component {
   }
 
   render() {
-    let games = this.state.games;
     return (
       <Dialog fullScreen
         open={this.props.open}
@@ -79,7 +74,7 @@ export default class EditLocations extends React.Component {
         <AppBar position="static">
           <Toolbar>
             <IconButton color="inherit" onClick={this.props.onClose}>
-              <CloseIcon/>
+              <CloseIcon />
             </IconButton>
             <Typography type="title" color="inherit">
               Edit Locations
@@ -87,14 +82,14 @@ export default class EditLocations extends React.Component {
           </Toolbar>
         </AppBar>
         <List>
-          {this.state.locations.map((l)=><Location
+          {this.state.locations.map((l) => <Location
             location={l}
             key={l}
             edit={this.edit_location.bind(this, l)}
             cancel={this.cancel_edit}
             delete={this.confirm_delete.bind(this, l)}
             save={this.complete_edit}
-            editing={this.state.editing===l}
+            editing={this.state.editing === l}
           />)}
           <ListItem>
             <TextField id="location" label="Location" type="text"
@@ -105,11 +100,11 @@ export default class EditLocations extends React.Component {
             <Button onClick={this.add_location}>Add</Button>
           </ListItem>
         </List>
-				<Dialog open={this.state.open} onClose={this.cancel_delete}>
+        <Dialog open={this.state.open} onClose={this.cancel_delete}>
           <DialogTitle>Confirm Deletion</DialogTitle>
           <DialogContent>
             <DialogContentText>
-            {"Are you sure you want to delete '" + this.state.to_delete + "'?"}
+              {"Are you sure you want to delete '" + this.state.to_delete + "'?"}
             </DialogContentText>
           </DialogContent>
           <DialogActions>

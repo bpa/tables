@@ -34,23 +34,24 @@ class Socket {
 
   init() {
     let self = this;
-    let path = location.toString()
-      .replace(/https?/, 'ws').replace(/\?.*$/,'') + 'websocket';
+    let path = window.location.toString()
+      .replace(/https?/, 'ws').replace(/\?.*$/, '') + 'websocket';
+    console.log(path);
     this.ws = new WebSocket(path);
     this.ws.onmessage = this.handle_message.bind(this);
-    this.ws.onopen = function() {
+    this.ws.onopen = function () {
       self.open = true;
       let buf = self.buffer;
       self.buffer = [];
       let player = JSON.parse(window.localStorage.player);
       if (player) {
-        self.send({cmd: 'login', method: 'trusted', username: player.fullName});
+        self.send({ cmd: 'login', method: 'trusted', username: player.fullName });
       }
       for (var m of buf) {
         self.ws.send(JSON.stringify(m));
       }
     }
-    this.ws.onclose = function() {
+    this.ws.onclose = function () {
       self.open = false;
       setTimeout(self.init.bind(self), 1000);
     }
@@ -84,7 +85,7 @@ class Socket {
       }
     }
   }
-} 
+}
 
 var ws = new Socket();
 export default ws;

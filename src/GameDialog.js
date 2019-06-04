@@ -1,7 +1,5 @@
 import React from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, FormControl, IconButton, ListItem, ListItemText, TextField } from '@material-ui/core';
-import Edit from '@material-ui/icons/Edit';
-import CloseIcon from '@material-ui/icons/Close';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, TextField } from '@material-ui/core';
 import ws from './Socket';
 
 export default class GameItem extends React.Component {
@@ -9,7 +7,7 @@ export default class GameItem extends React.Component {
     super(props);
     this.onEnter = this.onEnter.bind(this);
     this.update = this.update.bind(this);
-    this.state = {name:'',min:2,max:10};
+    this.state = { name: '', min: 2, max: 10 };
   }
 
   onEnter() {
@@ -17,12 +15,14 @@ export default class GameItem extends React.Component {
   }
 
   update() {
-    ws.send({cmd:'save_game', game: {
-      id: this.state.id,
-      min: parseInt(this.state.min),
-      max: parseInt(this.state.max),
-      name: this.state.name,
-    }});
+    ws.send({
+      cmd: 'save_game', game: {
+        id: this.state.id,
+        min: parseInt(this.state.min),
+        max: parseInt(this.state.max),
+        name: this.state.name,
+      }
+    });
     this.props.onClose()
   }
 
@@ -31,32 +31,31 @@ export default class GameItem extends React.Component {
     if (f !== 'name' && v < 2) {
       v = 2;
     }
-    this.setState({[f]: v});
+    this.setState({ [f]: v });
   }
 
   render() {
-    let game = this.props.game;
     return (
       <Dialog open={this.props.open} onEnter={this.onEnter}>
         <DialogTitle>{this.props.title}</DialogTitle>
         <DialogContent>
           <form noValidate autoComplete="off">
-            <FormControl style={{minWidth: 200}}>
+            <FormControl style={{ minWidth: 200 }}>
               <TextField id="game_name" label="Game" type="text" autoFocus
                 value={this.state.name}
                 InputLabelProps={{ shrink: true, }}
                 onChange={this.on_change.bind(this, 'name')}
               />
             </FormControl>
-            <br/>
-            <FormControl margin="normal" style={{maxWidth: 100}}>
+            <br />
+            <FormControl margin="normal" style={{ maxWidth: 100 }}>
               <TextField id="min" label="Min" type="number"
                 value={this.state.min}
                 InputLabelProps={{ shrink: true, }}
                 onChange={this.on_change.bind(this, 'min')}
               />
             </FormControl>
-            <FormControl margin="normal" style={{maxWidth: 100, position:'absolute',right:'24px'}}>
+            <FormControl margin="normal" style={{ maxWidth: 100, position: 'absolute', right: '24px' }}>
               <TextField id="max" label="Max" type="number"
                 value={this.state.max}
                 InputLabelProps={{ shrink: true, }}

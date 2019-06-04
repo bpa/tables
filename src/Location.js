@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, IconButton, ListItem, ListItemIcon, ListItemText, TextField } from '@material-ui/core';
+import { Button, IconButton, ListItem, ListItemText, TextField } from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import Delete from '@material-ui/icons/Delete';
 
@@ -13,7 +13,7 @@ export default class Location extends React.Component {
   }
 
   change(e) {
-    this.setState({location: e.target.value});
+    this.setState({ location: e.target.value });
   }
 
   delete() {
@@ -21,7 +21,7 @@ export default class Location extends React.Component {
   }
 
   edit() {
-    this.setState({location: this.props.location});
+    this.setState({ location: this.props.location });
     this.props.edit(this.props.location);
   }
 
@@ -46,9 +46,9 @@ export default class Location extends React.Component {
   normal() {
     return (
       <ListItem>
-        <IconButton onClick={this.delete}><Delete/></IconButton>
-        <IconButton onClick={this.edit}><Edit/></IconButton>
-        <ListItemText primary={this.props.location}/>
+        <IconButton onClick={this.delete}><Delete /></IconButton>
+        <IconButton onClick={this.edit}><Edit /></IconButton>
+        <ListItemText primary={this.props.location} />
       </ListItem>
     );
   }

@@ -13,46 +13,46 @@ export default class GameItem extends React.Component {
     this.delete_game = this.delete_game.bind(this);
     this.delete_confirmed = this.delete_confirmed.bind(this);
     this.delete_cancel = this.delete_cancel.bind(this);
-    this.state = {open: false, confirming: false};
+    this.state = { open: false, confirming: false };
   }
 
   cancel() {
-    this.setState({open: false});
+    this.setState({ open: false });
   }
 
   edit() {
-    this.setState({open: true});
+    this.setState({ open: true });
   }
 
-	delete_game() {
-    this.setState({confirming: true});
-	}
+  delete_game() {
+    this.setState({ confirming: true });
+  }
 
   delete_confirmed() {
-    ws.send({cmd:'delete_game', game: this.props.game.id});
-    this.setState({confirming: false});
+    ws.send({ cmd: 'delete_game', game: this.props.game.id });
+    this.setState({ confirming: false });
   }
 
   delete_cancel() {
-    this.setState({confirming: false});
+    this.setState({ confirming: false });
   }
 
   render() {
     let game = this.props.game,
-        players = game.min == game.max
-          ? game.min + ' players'
-          : game.min + '-' + game.max + ' players';
+      players = game.min === game.max
+        ? game.min + ' players'
+        : game.min + '-' + game.max + ' players';
     return (
       <div>
         <ListItem>
-          <IconButton onClick={this.delete_game}><Delete/></IconButton>
-          <IconButton onClick={this.edit}><Edit/></IconButton>
-          <ListItemText primary={players}/>
-          <ListItemText primary={game.name}/>
+          <IconButton onClick={this.delete_game}><Delete /></IconButton>
+          <IconButton onClick={this.edit}><Edit /></IconButton>
+          <ListItemText primary={players} />
+          <ListItemText primary={game.name} />
         </ListItem>
         <GameDialog game={game} title="Edit Game"
-          open={this.state.open} onClose={this.cancel}/>
-				<Dialog open={this.state.confirming} onClose={this.delete_cancel}>
+          open={this.state.open} onClose={this.cancel} />
+        <Dialog open={this.state.confirming} onClose={this.delete_cancel}>
           <DialogTitle>Confirm Deletion</DialogTitle>
           <DialogContent>
             <DialogContentText>
