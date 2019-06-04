@@ -37,5 +37,5 @@ func (nh NotifyHttp) NotifyNewTable(table *data.Table, author *data.Player, play
 }
 
 func (nh NotifyHttp) notify(p *data.Player, message string) {
-	http.Post(fmt.Sprintf(nh.Url, p.Id), "application/json", strings.NewReader(fmt.Sprintf(nh.Message, message)))
+	http.Post(fmt.Sprintf(nh.Url, p.ID), "application/json", strings.NewReader(fmt.Sprintf(nh.Message, message)))
 }

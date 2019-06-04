@@ -52,7 +52,7 @@ func TestGame(t *testing.T) {
 			if g.Min != i+1 || g.Max != i+3 {
 				t.Errorf("%s: %d-%d != %d-%d for %d", name, g.Min, g.Max, i+1, i+3, i+1)
 			}
-			storage.UpdateGame(g.Id, g.Name+"+2", i+2, i+4)
+			storage.UpdateGame(g.ID, g.Name+"+2", i+2, i+4)
 		}
 		list = storage.GetGames()
 		sort.Sort(byName(*list))
@@ -70,7 +70,7 @@ func TestGame(t *testing.T) {
 				t.Errorf("Max not updated")
 			}
 		}
-		storage.DeleteGame((*list)[1].Id)
+		storage.DeleteGame((*list)[1].ID)
 		list = storage.GetGames()
 		sort.Sort(byName(*list))
 		if len(*list) != 2 {
@@ -82,8 +82,8 @@ func TestGame(t *testing.T) {
 		if (*list)[1].Name != "3+2" {
 			t.Errorf("game 3 deleted by mistake")
 		}
-		storage.DeleteGame((*list)[0].Id)
-		storage.DeleteGame((*list)[1].Id)
+		storage.DeleteGame((*list)[0].ID)
+		storage.DeleteGame((*list)[1].ID)
 		if len(*storage.GetGames()) != 0 {
 			t.Errorf("Deletion failed")
 		}
@@ -129,16 +129,16 @@ func assertEq(t *testing.T, name, data string, exp, actual interface{}) {
 func TestPersistence(t *testing.T) {
 	defer os.Remove("state.json")
 	now := time.Now().Round(time.Nanosecond)
-	creator := Player{FirstName: "tester", Id: "me"}
+	creator := Player{FirstName: "tester", ID: "me"}
 
 	ids := make(map[string]string)
 	tableIds := make(map[string]string)
 	forImpl(func(name string, storage Storage) {
 		storage.CreateLocation(name)
 		storage.CreateGame("play", 1, 5)
-		ids[name] = (*storage.GetGames())[0].Id
+		ids[name] = (*storage.GetGames())[0].ID
 		storage.CreateTable(ids[name], name, now, &creator)
-		tableIds[name] = (*storage.GetTables())[0].Id
+		tableIds[name] = (*storage.GetTables())[0].ID
 		storage.SetPlayerNotifications(&creator, []string{"test"})
 	})
 
@@ -154,7 +154,7 @@ func TestPersistence(t *testing.T) {
 			Players:  []*Player{&creator},
 			Location: name,
 			Start:    now,
-			Id:       tableIds[name],
+			ID:       tableIds[name],
 		}}
 		assertEq(t, name, "Tables", &expTables, storage.GetTables())
 

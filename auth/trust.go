@@ -18,6 +18,6 @@ func (auth TrustedAuth) Authenticate(c data.Client, msg map[string]interface{}) 
 		return nil, errors.New("username is required")
 	}
 
-	player := data.Player{FullName: username, Id: c.Host()}
+	player := data.Player{FullName: username, ID: c.Host()}
 	return &player, nil
 }

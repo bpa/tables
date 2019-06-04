@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 )
 
 type memoryFile struct {
@@ -55,15 +55,15 @@ func (m *MemoryStorage) CreateLocation(location string) error {
 func (m *MemoryStorage) CreateTable(game, location string, start time.Time, creator *Player) (*Table, error) {
 	gameData := m.games[game]
 	if gameData.Name == "" {
-		return &Table{}, errors.New(fmt.Sprintf("No game %s available", game))
+		return &Table{}, fmt.Errorf(fmt.Sprintf("No game %s available", game))
 	}
 
 	players := make([]*Player, 0, gameData.Max)
 	players = append(players, creator)
 
 	table := m.AddNewTable(&gameData, location, start, players)
-	m.playing[table.Id] = make(map[string]bool)
-	m.playing[table.Id][creator.Id] = true
+	m.playing[table.ID] = make(map[string]bool)
+	m.playing[table.ID][creator.ID] = true
 	return &table, nil
 }
 
@@ -82,14 +82,13 @@ func (m *MemoryStorage) DeleteLocation(location string) error {
 		delete(m.locations, location)
 		m.saveState()
 		return nil
-	} else {
-		return errors.New("Location does not exist")
 	}
+	return errors.New("Location does not exist")
 }
 
 func (m *MemoryStorage) DeletePlayerNotifications(p *Player) {
 	for _, v := range m.notifications {
-		delete(v, p.Id)
+		delete(v, p.ID)
 	}
 }
 
@@ -108,9 +107,8 @@ func (m *MemoryStorage) UpdateLocation(from, to string) error {
 		m.locations[to] = true
 		m.saveState()
 		return nil
-	} else {
-		return errors.New("Location does not exist")
 	}
+	return errors.New("Location does not exist")
 }
 
 func (m *MemoryStorage) JoinTable(player *Player, id string) error {
@@ -119,12 +117,12 @@ func (m *MemoryStorage) JoinTable(player *Player, id string) error {
 		return errors.New("Unknown table")
 	}
 
-	if m.playing[id][player.Id] {
+	if m.playing[id][player.ID] {
 		return errors.New("Player already at table")
 	}
 
 	table.Players = append(table.Players, player)
-	m.playing[id][player.Id] = true
+	m.playing[id][player.ID] = true
 	m.saveState()
 	return nil
 }
@@ -135,13 +133,13 @@ func (m *MemoryStorage) LeaveTable(player *Player, id string) error {
 		return errors.New("Unknown table")
 	}
 
-	if !m.playing[id][player.Id] {
+	if !m.playing[id][player.ID] {
 		return errors.New("Player isn't at table")
 	}
 
-	delete(m.playing[id], player.Id)
+	delete(m.playing[id], player.ID)
 	for i := range table.Players {
-		if table.Players[i].Id == player.Id {
+		if table.Players[i].ID == player.ID {
 			table.Players = append(table.Players[:i], table.Players[i+1:]...)
 			m.saveState()
 			return nil
@@ -154,7 +152,7 @@ func (m *MemoryStorage) LeaveTable(player *Player, id string) error {
 func (m *MemoryStorage) UpdateGame(id, name string, min, max int) error {
 	_, ok := m.games[id]
 	if !ok {
-		id = uuid.Must(uuid.NewV4()).String()
+		id = uuid.Must(uuid.NewRandom()).String()
 	}
 
 	m.games[id] = Game{name, min, max, id}
@@ -174,16 +172,16 @@ func (m *MemoryStorage) readState() {
 			for _, t := range mem.Tables {
 				table := new(Table)
 				*table = t
-				m.tables[t.Id] = table
+				m.tables[t.ID] = table
 				playing := make(map[string]bool)
 				for _, p := range table.Players {
-					playing[p.Id] = true
+					playing[p.ID] = true
 				}
-				m.playing[t.Id] = playing
+				m.playing[t.ID] = playing
 			}
 
 			for _, g := range mem.Games {
-				m.games[g.Id] = g
+				m.games[g.ID] = g
 			}
 
 			for _, l := range mem.Locations {
@@ -195,7 +193,7 @@ func (m *MemoryStorage) readState() {
 				for _, p := range data {
 					player := new(Player)
 					*player = p
-					players[p.Id] = player
+					players[p.ID] = player
 				}
 				m.notifications[name] = players
 			}
@@ -239,7 +237,7 @@ func (m *MemoryStorage) GetGames() *[]Game {
 
 func (m *MemoryStorage) GetLocations() *[]string {
 	locations := make([]string, 0, len(m.locations))
-	for l, _ := range m.locations {
+	for l := range m.locations {
 		locations = append(locations, l)
 	}
 	return &locations
@@ -269,7 +267,7 @@ func (m *MemoryStorage) SetPlayerNotifications(p *Player, n []string) {
 			notifications = make(map[string]*Player)
 			m.notifications[method] = notifications
 		}
-		notifications[p.Id] = p
+		notifications[p.ID] = p
 	}
 	m.saveState()
 }
@@ -283,13 +281,13 @@ func (m *MemoryStorage) GetTables() *[]Table {
 }
 
 func (m *MemoryStorage) AddNewTable(game *Game, loc string, start time.Time, players []*Player) Table {
-	id := uuid.Must(uuid.NewV4()).String()
+	id := uuid.Must(uuid.NewRandom()).String()
 	table := Table{
 		Game:     game,
 		Players:  players,
 		Location: loc,
 		Start:    start,
-		Id:       id,
+		ID:       id,
 	}
 	m.tables[id] = &table
 	m.playing[id] = make(map[string]bool)
@@ -302,8 +300,8 @@ func (m *MemoryStorage) DeleteExpiredTables() bool {
 	now := time.Now()
 	for _, t := range m.tables {
 		if t.Start.Add(EXPIRE_TIME).Before(now) {
-			delete(m.tables, t.Id)
-			delete(m.playing, t.Id)
+			delete(m.tables, t.ID)
+			delete(m.playing, t.ID)
 			removed = true
 		}
 	}

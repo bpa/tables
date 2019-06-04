@@ -32,7 +32,7 @@ func saveGame(c data.Client, msg obj) error {
 		return errors.New("game.max is required")
 	}
 
-	if err := data.UpdateGame(g.Id, g.Name, g.Min, g.Max); err != nil {
+	if err := data.UpdateGame(g.ID, g.Name, g.Min, g.Max); err != nil {
 		return err
 	}
 	return hub.Broadcast(gamesMessage{"games", data.GetGames()})
