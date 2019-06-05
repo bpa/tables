@@ -1,3 +1,5 @@
+*.swp
+
 # Binaries for programs and plugins
 *.exe
 *.dll
@@ -16,6 +18,7 @@ tables
 
 # production
 /build
+/dist
 
 /node_modules
 /.pnp
