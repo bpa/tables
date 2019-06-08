@@ -36,15 +36,14 @@ class Socket {
     let self = this;
     let path = window.location.toString()
       .replace(/https?/, 'ws').replace(/\?.*$/, '') + 'websocket';
-    console.log(path);
     this.ws = new WebSocket(path);
     this.ws.onmessage = this.handle_message.bind(this);
     this.ws.onopen = function () {
       self.open = true;
       let buf = self.buffer;
       self.buffer = [];
-      let player = JSON.parse(window.localStorage.player);
-      if (player) {
+      if (window.localStorage.player) {
+        const player = JSON.parse(window.localStorage.player);
         self.send({ cmd: 'login', method: 'trusted', username: player.fullName });
       }
       for (var m of buf) {
