@@ -1,7 +1,0 @@
-{
-  "presets": ['env'], 
-  "plugins": [
-    'transform-react-jsx',
-    ["lodash", { "id": ["lodash", "semantic-ui-react"] }]
-  ]
-}
