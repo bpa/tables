@@ -12,6 +12,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "homepage": ".",
   "repository": {
     "type": "git",
     "url": "https://github.com/bpa/tables"
