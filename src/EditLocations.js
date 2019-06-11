@@ -1,122 +1,94 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import { AppBar, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, List, ListItem, TextField, Toolbar, Typography } from '@material-ui/core';
-import ws from './Socket';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import Location from './Location';
+import GlobalContext from './GlobalState';
+import { observer } from 'mobx-react-lite';
+import send from './Socket';
 
 const Up = React.forwardRef(function Up(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default class EditLocations extends React.Component {
-  constructor(props) {
-    super(props);
-    this.add_location = this.add_location.bind(this);
-    this.cancel_edit = this.cancel_edit.bind(this);
-    this.cancel_delete = this.cancel_delete.bind(this);
-    this.complete_edit = this.complete_edit.bind(this);
-    this.delete_location = this.delete_location.bind(this);
-    this.lcb = ws.register('locations', this.on_locations.bind(this));
-    this.state = { locations: [], input: '', open: false };
+export default observer((props) => {
+  let context = useContext(GlobalContext);
+  let [open, setOpen] = useState(false);
+  let [input, setInput] = useState('');
+  let [editing, setEditing] = useState('');
+  let [toDelete, setToDelete] = useState('');
+
+  function add_location() {
+    send({ cmd: "create_location", location: input });
+    setInput('');
   }
 
-  on_change(e) {
-    this.setState({ input: e.target.value });
+  function confirm_delete(l) {
+    setToDelete(l);
+    setOpen(true);
   }
 
-  on_locations(msg) {
-    this.setState({ locations: msg.locations });
+  function delete_location() {
+    send({ cmd: 'delete_location', location: toDelete });
+    setOpen(false);
   }
 
-  add_location() {
-    ws.send({ cmd: "create_location", location: this.state.input });
-    this.setState({ input: '' });
+  function complete_edit(new_value) {
+    send({ cmd: 'edit_location', from: editing, to: new_value });
+    setEditing('');
   }
 
-  edit_location(l) {
-    this.setState({ editing: l });
-  }
-
-  cancel_edit() {
-    this.setState({ editing: null });
-  }
-
-  confirm_delete(l) {
-    this.setState({ to_delete: l, open: true });
-  }
-
-  delete_location() {
-    ws.send({ cmd: 'delete_location', location: this.state.to_delete });
-    this.setState({ open: false });
-  }
-
-  cancel_delete() {
-    this.setState({ open: false });
-  }
-
-  complete_edit(new_value) {
-    ws.send({ cmd: 'edit_location', from: this.state.editing, to: new_value });
-    this.setState({ editing: null });
-  }
-
-  componentWillUnmount() {
-    ws.deregister(this.lcb);
-  }
-
-  render() {
-    return (
-      <Dialog fullScreen
-        open={this.props.open}
-        onClose={this.props.onClose}
-        TransitionComponent={Up}
-      >
-        <AppBar position="static">
-          <Toolbar>
-            <IconButton color="inherit" onClick={this.props.onClose}>
-              <CloseIcon />
-            </IconButton>
-            <Typography type="title" color="inherit">
-              Edit Locations
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <List>
-          {this.state.locations.map((l) => <Location
-            location={l}
-            key={l}
-            edit={this.edit_location.bind(this, l)}
-            cancel={this.cancel_edit}
-            delete={this.confirm_delete.bind(this, l)}
-            save={this.complete_edit}
-            editing={this.state.editing === l}
-          />)}
-          <ListItem>
-            <TextField id="location" label="Location" type="text"
-              InputLabelProps={{ shrink: true, }}
-              value={this.state.input}
-              onChange={this.on_change.bind(this)}
-            />
-            <Button onClick={this.add_location}>Add</Button>
-          </ListItem>
-        </List>
-        <Dialog open={this.state.open} onClose={this.cancel_delete}>
-          <DialogTitle>Confirm Deletion</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              {"Are you sure you want to delete '" + this.state.to_delete + "'?"}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.cancel_delete} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={this.delete_location} color="primary" autoFocus>
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+  return (
+    <Dialog fullScreen
+      open={props.open}
+      onClose={props.onClose}
+      TransitionComponent={Up}
+    >
+      <AppBar position="static">
+        <Toolbar>
+          <IconButton color="inherit" onClick={props.onClose}>
+            <CloseIcon />
+          </IconButton>
+          <Typography type="title" color="inherit">
+            Edit Locations
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <List>
+        {context.locations.map((l) => <Location
+          location={l}
+          key={l}
+          edit={() => setEditing(l)}
+          cancel={() => setEditing('')}
+          delete={confirm_delete.bind(null, l)}
+          save={complete_edit}
+          editing={editing === l}
+        />)}
+        <ListItem>
+          <TextField id="location" label="Location" type="text"
+            InputLabelProps={{ shrink: true, }}
+            value={input}
+            onChange={e => setInput(e.target.value)}
+          />
+          <Button onClick={add_location}>Add</Button>
+        </ListItem>
+      </List>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Confirm Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {"Are you sure you want to delete '" + toDelete + "'?"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={delete_location} color="primary" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
-    );
-  }
-}
+    </Dialog>
+  );
+});

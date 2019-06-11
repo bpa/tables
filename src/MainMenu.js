@@ -1,65 +1,59 @@
-import React from 'react';
+import React, { useState } from 'react';
 import MenuIcon from '@material-ui/icons/Menu';
 import { IconButton } from '@material-ui/core';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
-import ws from './Socket';
 import EditGames from './EditGames';
 import EditLocations from './EditLocations';
+import send from './Socket';
 
-export default class MainMenu extends React.Component {
-  constructor() {
-    super();
-    this.closeMenu = this.closeMenu.bind(this);
-    this.logout = this.logout.bind(this);
-    this.openMenu = this.openMenu.bind(this);
-    this.stopEditing = this.stopEditing.bind(this);
-    this.state = {open: false, anchor: null, type: null};
+export default function MainMenu() {
+  let [type, setType] = useState('');
+  let [anchor, setAnchor] = useState(undefined);
+
+  function edit(t) {
+    send({ cmd: 'list_' + t });
+    setType(t);
+    setAnchor(undefined);
   }
 
-  edit(type) {
-    ws.send({cmd: 'list_' + type});
-    this.setState({open: false, type: type});
+  function stopEditing() {
+    setType('');
   }
 
-  stopEditing() {
-    this.setState({type: null});
+  function logout() {
+    send({ cmd: 'logout' });
+    setAnchor(undefined);
   }
 
-  logout() {
-    ws.send({cmd: 'logout'});
-    this.setState({open: false});
+  function openMenu(e) {
+    setAnchor(e.currentTarget);
   }
 
-  openMenu(e) {
-    this.setState({open: true, anchor: e.currentTarget});
+  function closeMenu() {
+    setAnchor(undefined);
   }
 
-  closeMenu() {
-    this.setState({open: false});
-  }
-
-  render() {
-    return (
-      <div>
-        <IconButton color="inherit" aria-label="Menu"
-            style={{marginLeft:-12, marginRight:20}}
-            onClick={this.openMenu}>
-          <MenuIcon/>
-        </IconButton>
-        <Menu id="main-menu" anchorEl={this.state.anchor}
-          open={this.state.open}
-          onClose={this.closeMenu}
-        >
-          <MenuItem onClick={this.edit.bind(this, 'games')}>Edit Games</MenuItem>
-          <MenuItem onClick={this.edit.bind(this, 'locations')}>Edit Locations</MenuItem>
-          <MenuItem onClick={this.logout}>Log out</MenuItem>
-        </Menu>
-        <EditGames open={this.state.type === 'games'}
-          onClose={this.stopEditing}/>
-        <EditLocations open={this.state.type === 'locations'}
-          onClose={this.stopEditing}/>
-      </div>
-    );
-  }
+  return (
+    <>
+      <IconButton color="inherit" aria-label="Menu"
+        style={{ marginLeft: -12, marginRight: 20 }}
+        onClick={openMenu}>
+        <MenuIcon />
+      </IconButton>
+      <Menu id="main-menu" anchorEl={anchor}
+        keepMounted
+        open={!!anchor}
+        onClose={closeMenu}
+      >
+        <MenuItem onClick={() => edit('games')}>Edit Games</MenuItem>
+        <MenuItem onClick={() => edit('locations')}>Edit Locations</MenuItem>
+        <MenuItem onClick={logout}>Log out</MenuItem>
+      </Menu>
+      <EditGames open={type === 'games'}
+        onClose={stopEditing} />
+      <EditLocations open={type === 'locations'}
+        onClose={stopEditing} />
+    </>
+  );
 }

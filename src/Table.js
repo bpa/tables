@@ -1,15 +1,16 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button, Card, CardContent, CardActions, Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
 import People from '@material-ui/icons/People';
 import Event from '@material-ui/icons/Event';
 import Schedule from '@material-ui/icons/Schedule';
 import Room from '@material-ui/icons/Room';
 import moment from 'moment';
-import { player } from './Login';
-import ws from './Socket';
+import send from './Socket';
+import { observer } from 'mobx-react-lite';
+import GlobalContext from './GlobalState';
 
 function Player(props) {
-  let name = props.player ? props.player.fullName || '' : '';
+  let name = (props.player && props.player.fullName) || '';
   return (
     <ListItem dense={true}>
       <ListItemText secondary={props.i + '.'} />
@@ -20,26 +21,29 @@ function Player(props) {
 
 function Players(props) {
   let players = props.players || [],
+    p = players.length,
     total = Math.max(props.max, players.length),
     list = [];
   for (var i = 0; i < total; i++) {
-    list.push(<Player key={i} i={i + 1} player={players[i]} />);
+    list.push(<Player key={i} i={i + 1} player={i < p && players[i]} />);
   }
   return <List>{list}</List>;
 }
 
 function leave_table() {
-  ws.send({ cmd: 'leave_table', id: this.id });
+  send({ cmd: 'leave_table', id: this.id });
 }
 
 function join_table() {
-  ws.send({ cmd: 'join_table', id: this.id });
+  send({ cmd: 'join_table', id: this.id });
 }
 
-export default function Table(props) {
+export default observer((props) => {
+  let context = useContext(GlobalContext);
+  let me = context.player.id;
   let table = props.table,
     start = moment(table.start, moment.ISO_8601).format("h:mm A"),
-    seat = table.players.findIndex((p) => player.data && player.data.id === p.id),
+    seat = table.players.findIndex((p) => p.id === me),
     join = seat === -1,
     // owner = seat === 0,
     players = table.game.min === table.game.max
@@ -78,5 +82,5 @@ export default function Table(props) {
       </CardActions>
     </Card>
   );
-}
+});
 
