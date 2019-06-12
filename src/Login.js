@@ -6,7 +6,7 @@ import { observer } from 'mobx-react-lite';
 
 export default observer(() => {
   let context = useContext(GlobalContext);
-  let [name, setName] = useState('');
+  let [name, setName] = useState(context.player.fullName);
 
   function login(e) {
     e.preventDefault();
