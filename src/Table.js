@@ -1,5 +1,6 @@
-import React, { useContext } from 'react';
-import { Button, Card, CardContent, CardActions, Divider, List, ListItem, ListItemIcon, ListItemText } from '@material-ui/core';
+import React, { useContext, useState } from 'react';
+import { Button, Card, CardContent, CardActions, Divider, List, ListItem, ListItemIcon, ListItemText, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@material-ui/core';
+import DeleteForever from '@material-ui/icons/DeleteForever';
 import People from '@material-ui/icons/People';
 import Event from '@material-ui/icons/Event';
 import Schedule from '@material-ui/icons/Schedule';
@@ -40,15 +41,21 @@ function join_table() {
 
 export default observer((props) => {
   let context = useContext(GlobalContext);
+  let [open, setOpen] = useState(false);
+
   let me = context.player.id;
   let table = props.table,
     start = moment(table.start, moment.ISO_8601).format("h:mm A"),
     seat = table.players.findIndex((p) => p.id === me),
     join = seat === -1,
-    // owner = seat === 0,
+    owner = seat === 0,
     players = table.game.min === table.game.max
       ? table.game.min + ' players'
       : table.game.min + '-' + table.game.max + ' players';
+
+  function deleteGame() {
+    send({cmd: 'delete_table', id: table.id })
+  }
 
   return (
     <Card elevation={4} style={{ padding: 4, margin: 8 }}>
@@ -76,10 +83,26 @@ export default observer((props) => {
       </CardContent>
       <CardActions>
         {join
-          ? <Button dense="true" onClick={join_table.bind(table)}>Join</Button>
-          : <Button dense="true" onClick={leave_table.bind(table)}>Leave</Button>
+          ? <Button dense="true" color="primary" onClick={join_table.bind(table)}>Join</Button>
+          : <Button dense="true" color="primary" onClick={leave_table.bind(table)}>Leave</Button>
+        }
+        {owner && <Button dense="true" color="secondary" onClick={() => setOpen(true)}>
+          Delete<DeleteForever />
+        </Button>
         }
       </CardActions>
+      <Dialog open={open}>
+        <DialogTitle>Confirm Table Deletion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete {table.game.name}?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button dense="true" color="primary" onClick={deleteGame}>Delete</Button>
+          <Button dense="true" color="secondary" onClick={() => setOpen(false)}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   );
 });
