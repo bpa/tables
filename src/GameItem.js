@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ListItem, ListItemText } from '@material-ui/core';
+import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, ListItem, ListItemText, GridListTile, Grid } from '@material-ui/core';
 import Delete from '@material-ui/icons/Delete';
 import Edit from '@material-ui/icons/Edit';
 import GameDialog from './GameDialog';
@@ -22,10 +22,14 @@ export default function GameItem(props) {
   return (
     <>
       <ListItem>
-        <IconButton onClick={() => setConfirming(true)}><Delete /></IconButton>
-        <IconButton onClick={() => setOpen(true)}><Edit /></IconButton>
-        <ListItemText primary={players} />
-        <ListItemText primary={game.name} />
+        <Grid item xs={1}>
+          <IconButton onClick={() => setConfirming(true)}><Delete /></IconButton>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton onClick={() => setOpen(true)}><Edit /></IconButton>
+        </Grid>
+        <Grid item xs={4}><ListItemText primary={players} /></Grid>
+        <Grid item xs={6}><ListItemText primary={game.name} /></Grid>
       </ListItem>
       <GameDialog game={game} title="Edit Game"
         open={open} onClose={() => setOpen(false)} />

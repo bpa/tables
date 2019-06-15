@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, IconButton, ListItem, ListItemText, TextField } from '@material-ui/core';
+import { Button, IconButton, ListItem, ListItemText, TextField, Grid } from '@material-ui/core';
 import Edit from '@material-ui/icons/Edit';
 import Delete from '@material-ui/icons/Delete';
 
@@ -46,9 +46,15 @@ export default class Location extends React.Component {
   normal() {
     return (
       <ListItem>
-        <IconButton onClick={this.delete}><Delete /></IconButton>
-        <IconButton onClick={this.edit}><Edit /></IconButton>
-        <ListItemText primary={this.props.location} />
+        <Grid item xs={1}>
+          <IconButton onClick={this.delete}><Delete /></IconButton>
+        </Grid>
+        <Grid item xs={1}>
+          <IconButton onClick={this.edit}><Edit /></IconButton>
+        </Grid>
+        <Grid item xs={10}>
+          <ListItemText primary={this.props.location} />
+        </Grid>
       </ListItem>
     );
   }
